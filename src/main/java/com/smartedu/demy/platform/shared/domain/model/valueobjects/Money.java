@@ -2,58 +2,47 @@ package com.smartedu.demy.platform.shared.domain.model.valueobjects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.EqualsAndHashCode;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Objects;
 
 @Embeddable
-@EqualsAndHashCode
-public class Money {
+public record Money(
+        @Column(nullable = false, precision = 15, scale = 2)
+        BigDecimal amount,
 
-    @Column(nullable = false, precision = 15, scale = 2)
-    private BigDecimal amount;
+        @Column(nullable = false)
+        Currency currency
+) {
+    public Money() {
+        this(BigDecimal.ZERO, Currency.getInstance("USD"));
+    }
 
-    @Column(nullable = false)
-    private Currency currency;
-
-    protected Money() {}
-
-    public Money(BigDecimal amount, Currency currency) {
-        if (amount == null || currency == null) {
-            throw new IllegalArgumentException("Amount and currency must not be null");
-        }
+    public Money {
+        Objects.requireNonNull(amount, "Amount must not be null");
+        Objects.requireNonNull(currency, "Currency must not be null");
         if (amount.signum() < 0) {
-            throw new IllegalArgumentException("Amount must be non-negative");
+            throw new IllegalArgumentException("Amount must be positive");
         }
-        this.amount = amount;
-        this.currency = currency;
-    }
-
-    public BigDecimal amount() {
-        return amount;
-    }
-
-    public Currency currency() {
-        return currency;
     }
 
     public Money add(Money other) {
-        checkCurrencyMatch(other);
+        requireSameCurrency(other);
         return new Money(this.amount.add(other.amount), this.currency);
     }
 
     public Money subtract(Money other) {
-        checkCurrencyMatch(other);
+        requireSameCurrency(other);
         BigDecimal result = this.amount.subtract(other.amount);
         if (result.signum() < 0) {
-            throw new IllegalArgumentException("Money result cannot be negative");
+            throw new IllegalArgumentException("Resulting amount cannot be negative");
         }
         return new Money(result, this.currency);
     }
 
     public boolean isGreaterThanOrEqual(Money other) {
-        checkCurrencyMatch(other);
+        requireSameCurrency(other);
         return this.amount.compareTo(other.amount) >= 0;
     }
 
@@ -61,13 +50,13 @@ public class Money {
         return this.amount.signum() == 0;
     }
 
-    private void checkCurrencyMatch(Money other) {
-        if (!this.currency.equals(other.currency)) {
-            throw new IllegalArgumentException("Currency mismatch: " + this.currency + " vs " + other.currency);
-        }
-    }
-
     public static Money zero(Currency currency) {
         return new Money(BigDecimal.ZERO, currency);
+    }
+
+    private void requireSameCurrency(Money other) {
+        if (!this.currency.equals(other.currency)) {
+            throw new IllegalArgumentException("Currency mismatch: " + this.currency + ", " + other.currency);
+        }
     }
 }
