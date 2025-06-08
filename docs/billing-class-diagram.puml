@@ -1,0 +1,46 @@
+@startuml
+
+skinparam classAttributeIconSize 0
+
+package "billing.domain.model.aggregates" {
+
+    package "Invoice Aggregate" {
+        class Invoice <<AggregateRoot>> {
+            - InvoiceId id
+            - StudentId studentId
+            - Money amount
+            - LocalDate dueDate
+            - InvoiceStatus status
+            - List<Payment> payments
+        }
+
+        class Payment {
+            - PaymentId id
+            - Money amount
+            - PaymentMethod method
+            - LocalDateTime createdAt
+        }
+
+        Invoice "1" *-- "0..*" Payment : contains
+    }
+
+    package "Transaction Aggregate" {
+        class FinancialTransaction <<AggregateRoot>> {
+            - TransactionId id
+            - String source
+            - String target
+            - TransactionType type
+            - TransactionCategory category
+            - String concept
+            - LocalDateTime dateTime
+            - String reference
+            - PaymentId paymentId
+            - Money amount
+            - PaymentMethod method
+        }
+    }
+
+    Payment --> FinancialTransaction : generates
+}
+
+@enduml
