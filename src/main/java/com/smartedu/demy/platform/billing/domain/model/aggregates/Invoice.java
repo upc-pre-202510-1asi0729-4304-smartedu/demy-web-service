@@ -1,6 +1,8 @@
 package com.smartedu.demy.platform.billing.domain.model.aggregates;
 
 import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.Money;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.StudentId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
