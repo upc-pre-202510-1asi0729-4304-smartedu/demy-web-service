@@ -1,6 +1,5 @@
 package com.smartedu.demy.platform.iam.interfaces.rest.controllers;
 
-import com.smartedu.demy.platform.iam.application.internal.queryservices.UserAccountQueryServiceImpl;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountQueryService;
 import com.smartedu.demy.platform.iam.interfaces.rest.resources.*;
 import com.smartedu.demy.platform.iam.interfaces.rest.transform.UserAccountResourceFromEntityAssembler;
@@ -14,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

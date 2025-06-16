@@ -4,7 +4,6 @@ import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
 import com.smartedu.demy.platform.iam.domain.model.resources.Email;
 import com.smartedu.demy.platform.iam.domain.model.resources.FullName;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.AccountStatus;
-import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.shared.domain.model.services.PasswordHasher;
 import lombok.Data;
 

@@ -1,7 +1,6 @@
 package com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositories;
 
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
-import com.smartedu.demy.platform.iam.domain.model.resources.Email;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;

@@ -1,7 +1,6 @@
 package com.smartedu.demy.platform.iam.application.internal.queryservices;
 
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
-import com.smartedu.demy.platform.iam.domain.model.resources.Email;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountCommandService;
 import com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositories.UserAccountRepository;

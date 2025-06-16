@@ -11,7 +11,6 @@ import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.Objects;
 
 
 
