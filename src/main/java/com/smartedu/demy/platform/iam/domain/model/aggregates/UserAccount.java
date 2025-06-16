@@ -1,72 +1,82 @@
 package com.smartedu.demy.platform.iam.domain.model.aggregates;
 
-import com.smartedu.demy.platform.iam.domain.model.entities.AccountStatus;
-import com.smartedu.demy.platform.iam.domain.model.entities.Role;
-import com.smartedu.demy.platform.iam.domain.model.valueobjects.Email;
-import com.smartedu.demy.platform.iam.domain.model.valueobjects.FullName;
-import com.smartedu.demy.platform.iam.domain.model.valueobjects.UserId;
+import com.smartedu.demy.platform.iam.domain.model.valueobjects.AccountStatus;
+import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
+import com.smartedu.demy.platform.iam.domain.model.resources.Email;
+import com.smartedu.demy.platform.iam.domain.model.resources.FullName;
+import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
+
+
 import jakarta.persistence.*;
+import lombok.Getter;
+
+import java.util.Objects;
+
+
 
 @Entity
-@Table(name = "user_accounts")
-public class UserAccount {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class UserAccount extends AuditableAbstractAggregateRoot<UserAccount> {
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "full_name"))
+    @Getter
+    private final UserId userId;
+
+    @Embedded
+    @Getter
     private FullName fullName;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "email"))
+    @Getter
     private Email email;
 
+    @Column(nullable = false)
+    @Getter
     private String passwordHash;
 
     @Enumerated(EnumType.STRING)
-    private Role role;
+    @Column(nullable = false)
+    @Getter
+    private Roles role;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Getter
     private AccountStatus status;
 
-    public void activate() {
-        this.status = AccountStatus.ACTIVE;
+
+
+
+    protected UserAccount() {
+        this.userId = null;
+        this.fullName = null;
+        this.email = null;
+        this.passwordHash = null;
+        this.role = null;
+        this.status = null;
     }
 
-    public void deactivate() {
-        this.status = AccountStatus.INACTIVE;
+    public UserAccount(UserId userId, FullName fullName, Email email, String passwordHash, Roles role, AccountStatus status) {
+        this.userId = userId;
+        this.fullName = fullName;
+        this.email = email;
+        this.passwordHash = passwordHash;
+        this.role = role;
+        this.status = status;
+    }
+    public void updateProfile(FullName fullName, Email email) {
+        this.fullName = fullName;
+        this.email = email;
+    }
+    public void updateRole(Roles role) {
+        this.role = role;
     }
 
-    public void block() {
-        this.status = AccountStatus.BLOCKED;
+    public void updateStatus(AccountStatus status) {
+        this.status = status;
+    }
+    public void updatePassword(String newHashedPassword) {
+        this.passwordHash = newHashedPassword;
     }
 
-    public void changePassword(String newHash) {
-        this.passwordHash = newHash;
-    }
-
-    public void updateEmail(Email newEmail) {
-        this.email = newEmail;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public FullName getFullName() {
-        return fullName;
-    }
-
-    public Email getEmail() {
-        return email;
-    }
-
-    public Role getRole() {
-        return role;
-    }
-
-    public AccountStatus getStatus() {
-        return status;
-    }
 }
