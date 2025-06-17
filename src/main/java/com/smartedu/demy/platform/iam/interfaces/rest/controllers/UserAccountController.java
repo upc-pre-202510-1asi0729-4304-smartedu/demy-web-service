@@ -30,7 +30,6 @@ public class UserAccountController {
         this.commandService = commandService;
     }
 
-    /* ─────────────────────────  CONSULTAS  ───────────────────────── */
 
     @Operation(summary = "Get admin profiles")
     @GetMapping("/admins")
@@ -61,7 +60,6 @@ public class UserAccountController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    /* ─────────────────────────  COMANDOS  ───────────────────────── */
 
     @Operation(summary = "Add new teacher profile")
     @PostMapping("/teachers")

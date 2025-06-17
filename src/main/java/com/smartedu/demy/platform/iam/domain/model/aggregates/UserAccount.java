@@ -17,9 +17,6 @@ import lombok.Getter;
 @Entity
 public class UserAccount extends AuditableAbstractAggregateRoot<UserAccount> {
 
-    @Embedded
-    @Getter
-    private final UserId userId;
 
     @Embedded
     @Getter
@@ -47,7 +44,6 @@ public class UserAccount extends AuditableAbstractAggregateRoot<UserAccount> {
 
 
     protected UserAccount() {
-        this.userId = null;
         this.fullName = null;
         this.email = null;
         this.passwordHash = null;
@@ -55,8 +51,7 @@ public class UserAccount extends AuditableAbstractAggregateRoot<UserAccount> {
         this.status = null;
     }
 
-    public UserAccount(UserId userId, FullName fullName, Email email, String passwordHash, Roles role, AccountStatus status) {
-        this.userId = userId;
+    public UserAccount( FullName fullName, Email email, String passwordHash, Roles role, AccountStatus status) {
         this.fullName = fullName;
         this.email = email;
         this.passwordHash = passwordHash;
@@ -78,4 +73,7 @@ public class UserAccount extends AuditableAbstractAggregateRoot<UserAccount> {
         this.passwordHash = newHashedPassword;
     }
 
+    public UserId getUserId() {
+        return new UserId(this.getId());
+    }
 }
