@@ -15,7 +15,6 @@ public record CreateTeacherResource(
 ) {
     public UserAccount toEntity() {
         return new UserAccount(
-                null,
                 new FullName(firstName, lastName),
                 new Email(email),
                 PasswordHasher.hash(password),
