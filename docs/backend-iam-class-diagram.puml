@@ -1,0 +1,115 @@
+
+@startuml Iam Backend Class Diagram
+skinparam classAttributeIconSize 0
+
+' ===== Domain =====
+package "iam.domain.model.aggregates" {
+    class UserAccount <<AggregateRoot>> {
+        - UserId id
+        - FullName fullName
+        - Email email
+        - String passwordHash
+        - Roles role
+        - AccountStatus status
+        --
+        +void updateProfile(FullName, Email)
+        +void updateRole(Roles)
+        +void updateStatus(AccountStatus)
+        +void updatePassword(String)
+        +UserId getUserId()
+    }
+}
+
+package "iam.domain.model.valueobjects" {
+    enum Roles <<Enum>> {
+        ADMIN
+        TEACHER
+    }
+    enum AccountStatus <<Enum>> {
+        ACTIVE
+        INACTIVE
+        BLOCKED
+    }
+    class Email <<ValueObject>> {
+        +value : String
+    }
+    class FullName <<ValueObject>> {
+        +firstName : String
+        +lastName  : String
+        +getFullName() : String
+    }
+}
+
+package "iam.domain.model.commands" {
+    class SignUpCommand   <<Command>>
+    class SignInCommand   <<Command>>
+}
+
+package "iam.domain.model.queries" {
+    class GetUserAccountByStudentIdQuery <<Query>>
+}
+
+' ===== Services =====
+package "iam.domain.services" {
+    interface UserAccountCommandService <<Service>> {
+        +createTeacher(CreateTeacherResource) : UserAccount
+        +updateTeacher(id: Long, UpdateTeacherResource) : UserAccount
+        +updateAdmin(id: Long, UpdateAdminResource) : UserAccount
+        +deleteTeacher(id: Long)
+        +resetPassword(ResetPasswordResource)
+    }
+
+    interface UserAccountQueryService <<Service>> {
+        +findAdmins()   : List<UserAccount>
+        +findTeachers() : List<UserAccount>
+        +findById(id: Long) : Optional<UserAccount>
+    }
+
+    class UserAccountCommandServiceImpl <<Service>>
+    class UserAccountQueryServiceImpl  <<Service>>
+}
+
+' ===== Persistence =====
+package "iam.infrastructure.persistence.jpa.repositories" {
+    interface UserAccountRepository <<Repository>> {
+        +findByRole(role: Roles) : List<UserAccount>
+        +findByEmail(value: String) : Optional<UserAccount>
+    }
+}
+
+' ===== REST Layer =====
+package "iam.interfaces.rest.resources" {
+    class CreateTeacherResource <<Resource>>
+    class UpdateTeacherResource <<Resource>>
+    class UpdateAdminResource   <<Resource>>
+    class ResetPasswordResource <<Resource>>
+    class UserAccountResource   <<Resource>>
+}
+
+package "iam.interfaces.rest.controllers" {
+    class UserAccountController <<Controller>>
+}
+
+' ===== Config =====
+package "iam.config" {
+    class SecurityConfig <<Config>>
+}
+
+' ===== Relationships =====
+UserAccountCommandServiceImpl ..|> UserAccountCommandService
+UserAccountQueryServiceImpl  ..|> UserAccountQueryService
+
+UserAccountCommandServiceImpl --> UserAccountRepository : uses
+UserAccountQueryServiceImpl  --> UserAccountRepository : uses
+UserAccountRepository --> UserAccount : persists
+
+UserAccountCommandServiceImpl ..> CreateTeacherResource
+UserAccountCommandServiceImpl ..> UpdateTeacherResource
+UserAccountCommandServiceImpl ..> UpdateAdminResource
+UserAccountCommandServiceImpl ..> ResetPasswordResource
+
+UserAccountController ..> UserAccountCommandService : delegates
+UserAccountController ..> UserAccountQueryService  : delegates
+UserAccountController ..> (CreateTeacherResource, UpdateTeacherResource, UpdateAdminResource, ResetPasswordResource) : consumes/produces
+
+@enduml
