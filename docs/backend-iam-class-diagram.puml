@@ -40,14 +40,8 @@ package "iam.domain.model.valueobjects" {
     }
 }
 
-package "iam.domain.model.commands" {
-    class SignUpCommand   <<Command>>
-    class SignInCommand   <<Command>>
-}
 
-package "iam.domain.model.queries" {
-    class GetUserAccountByStudentIdQuery <<Query>>
-}
+
 
 ' ===== Services =====
 package "iam.domain.services" {
@@ -90,10 +84,6 @@ package "iam.interfaces.rest.controllers" {
     class UserAccountController <<Controller>>
 }
 
-' ===== Config =====
-package "iam.config" {
-    class SecurityConfig <<Config>>
-}
 
 ' ===== Relationships =====
 UserAccountCommandServiceImpl ..|> UserAccountCommandService
@@ -110,6 +100,9 @@ UserAccountCommandServiceImpl ..> ResetPasswordResource
 
 UserAccountController ..> UserAccountCommandService : delegates
 UserAccountController ..> UserAccountQueryService  : delegates
-UserAccountController ..> (CreateTeacherResource, UpdateTeacherResource, UpdateAdminResource, ResetPasswordResource) : consumes/produces
+UserAccountController ..> CreateTeacherResource : consumes/produces
+UserAccountController ..> UpdateTeacherResource : consumes/produces
+UserAccountController ..> UpdateAdminResource : consumes/produces
+UserAccountController ..> ResetPasswordResource : consumes/produces
 
 @enduml
