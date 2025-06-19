@@ -60,7 +60,6 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
                 .ifPresent(u -> { throw new RuntimeException("Email already registered"); });
 
         var admin = r.toEntity();
-        // Por claridad, aunque ya viene con el rol ADMIN desde toEntity()
         admin.updateRole(Roles.ADMIN);
 
         return repo.save(admin);
