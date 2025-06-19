@@ -12,7 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -49,22 +51,32 @@ public class UserAccountController {
      * -----------------------------------------------------------
      */
 
-    @Operation(summary = "Admin sign‑up")
+    @Operation(summary = "Admin sign-up")
     @PostMapping("/admins/sign-up")
-    public ResponseEntity<UserAccountResource> signUpAdmin(
+    public ResponseEntity<Map<String, Object>> signUpAdmin(
             @RequestBody @Valid SignUpAdminResource body) {
         var created = commandService.signUpAdmin(body);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(UserAccountResourceFromEntityAssembler.toResource(created));
+        var resource = UserAccountResourceFromEntityAssembler.toResource(created);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Admin registered successfully");
+        response.put("user", resource);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @Operation(summary = "Admin sign‑in")
+    @Operation(summary = "Admin sign-in")
     @PostMapping("/admins/sign-in")
-    public ResponseEntity<UserAccountResource> signInAdmin(
+    public ResponseEntity<Map<String, Object>> signInAdmin(
             @RequestBody @Valid SignInAdminResource body) {
         var user = commandService.signInAdmin(body);
-        return ResponseEntity.ok(
-                UserAccountResourceFromEntityAssembler.toResource(user));
+        var resource = UserAccountResourceFromEntityAssembler.toResource(user);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Admin login successful");
+        response.put("user", resource);
+
+        return ResponseEntity.ok(response);
     }
 
     /* -----------------------------------------------------------
@@ -98,11 +110,16 @@ public class UserAccountController {
 
     @Operation(summary = "Teacher sign‑in")
     @PostMapping("/teachers/sign-in")
-    public ResponseEntity<UserAccountResource> signInTeacher(
+    public ResponseEntity<Map<String, Object>>  signInTeacher(
             @RequestBody @Valid SignInTeacherResource body) {
         var user = commandService.signInTeacher(body);
-        return ResponseEntity.ok(
-                UserAccountResourceFromEntityAssembler.toResource(user));
+        var resource = UserAccountResourceFromEntityAssembler.toResource(user);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Teacher login successful");
+        response.put("user", resource);
+
+        return ResponseEntity.ok(response);
     }
 
     /* -----------------------------------------------------------
