@@ -1,0 +1,221 @@
+@startuml Billing Context Class Diagram
+
+' Style settings
+skinparam classFontSize 14
+skinparam classFontName Arial
+skinparam classAttributeFontSize 12
+skinparam classAttributeFontName Arial
+skinparam packageStyle rectangle
+
+' Core services and interfaces (from shared context)
+package "shared" {
+    package "services" {
+        abstract class BaseService<T> {
+            #resourceEndpoint: string
+            +getAll(): Observable<T[]>
+            +getById(id: number): Observable<T>
+            +create(entity: T): Observable<T>
+            +update(id: number, entity: T): Observable<T>
+            +delete(id: number): Observable<void>
+        }
+    }
+
+    package "components" {
+        class BaseFormComponent <<Component>> {
+            #isInvalidControl(form: FormGroup, controlName: string): boolean
+            #errorMessagesForControl(form: FormGroup, controlName: string): string
+            -errorMessageForControl(controlName: string, errorKey: string): string
+        }
+    }
+}
+
+' Billing module entities
+package "billing" {
+    package "model" {
+        enum PartyType <<Enum>> {
+            STUDENT
+            TEACHER
+            ADMIN
+            ACADEMY
+            EXTERNAL
+        }
+
+        enum PaymentStatus <<Enum>> {
+            PENDING
+            PAID
+            OVERDUE
+        }
+
+        class FinancialTransaction <<Entity>> {
+            -id: string
+            -source: PartyType
+            -target: PartyType
+            -type: string
+            -category: string
+            -concept: string
+            -date: Date
+            -reference: string
+            -paymentId?: string
+            -amount: number
+            -method: string
+            +constructor(financialTransaction: {...})
+        }
+
+        class Invoice <<Entity>> {
+            -id: string
+            -subscriptionId: number | null
+            -amount: number
+            -dueDate: Date | null
+            -status: PaymentStatus
+            -studentId: string
+            +constructor(Invoice: {...})
+        }
+
+        class Payment <<Entity>> {
+            -id?: string
+            -invoiceId: string | null
+            -paidAt: Date
+            -method: string
+            -amount: number
+            +constructor(Payment: {...})
+        }
+
+        interface StudentPaymentStatus <<Interface>> {
+            student: Student
+            invoices: Invoice[]
+        }
+    }
+
+    package "services" {
+        class FinancialTransactionService <<Service>> extends shared.services.BaseService<billing.model.FinancialTransaction> {
+            -resourceEndpoint: string
+            +constructor()
+        }
+
+        class InvoiceService <<Service>> extends shared.services.BaseService<billing.model.Invoice> {
+            -resourceEndpoint: string
+            +constructor()
+            +getByStudentId(studentId: string): Observable<Invoice[]>
+        }
+
+        class PaymentService <<Service>> extends shared.services.BaseService<billing.model.Payment> {
+            -resourceEndpoint: string
+            +constructor()
+        }
+    }
+
+    package "components" {
+        class ExpenseFormComponent <<Component>> extends shared.components.BaseFormComponent {
+            -fb: FormBuilder
+            +form: FormGroup
+            +categories: Array<{value: string, labelKey: string}>
+            @Output() confirm: EventEmitter<any>
+            +constructor(fb: FormBuilder)
+            +onSubmit(): void
+        }
+
+        class ExpenseTableComponent <<Component>> implements AfterViewInit {
+            @Input() expenses: FinancialTransaction[]
+            @ViewChild(MatPaginator) paginator: MatPaginator
+            +dataSource: MatTableDataSource<FinancialTransaction>
+            +displayedColumns: string[]
+            +total: WritableSignal<number>
+            +ngAfterViewInit(): void
+            -calculateTotal(data: FinancialTransaction[]): number
+        }
+
+        class PaymentRegistrationComponent <<Component>> extends shared.components.BaseFormComponent {
+            @Input() student: Student
+            @Input() invoice: Invoice
+            @Output() paymentRegistered: EventEmitter<{amount: number, paidAt: Date}>
+            @ViewChild('paymentForm') paymentForm: NgForm
+            +paidAt: Date
+            +onSubmit(): void
+        }
+
+        class StudentSearchComponent <<Component>> {
+            +value: string
+            @Output() search: EventEmitter<string>
+            +onSearchClick(): void
+        }
+
+        class StudentStatusComponent <<Component>> {
+            @Input() data: Invoice[]
+            @Input() student: Student
+            @Output() registerPaymentRequested: EventEmitter<Invoice>
+            +displayedColumns: string[]
+        }
+    }
+
+    package "pages" {
+        class ExpensesPageComponent <<Component>> {
+            -transactionService: FinancialTransactionService
+            +expenses: Signal<FinancialTransaction[]>
+            +constructor(transactionService: FinancialTransactionService)
+            +loadCurrentMonthExpenses(): void
+            +handleRegister(expenseData: any): void
+        }
+
+        class PaymentsComponent <<Component>> {
+            -studentService: StudentService
+            -invoiceService: InvoiceService
+            -paymentService: PaymentService
+            -transactionService: FinancialTransactionService
+            +studentPaymentStatus: Signal<StudentPaymentStatus | null>
+            +selectedInvoice: Signal<Invoice | null>
+            +showPaymentForm: Signal<boolean>
+            +constructor(studentService, invoiceService, paymentService, transactionService)
+            +onSearch(dni: string): void
+            +onRegisterPaymentRequest(invoice: Invoice): void
+            +onPaymentRegistered(paymentData: {amount: number, paidAt: Date}): void
+        }
+    }
+}
+
+' External modules/services
+package "enrollments" {
+    class Student <<Entity>> {
+        -id: string
+        '... other properties
+    }
+
+    class StudentService <<Service>> {
+        +getByDni(dni: string): Observable<Student[]>
+    }
+}
+
+' Relationships
+billing.services.FinancialTransactionService --> billing.model.FinancialTransaction: manages
+billing.services.InvoiceService --> billing.model.Invoice: manages
+billing.services.PaymentService --> billing.model.Payment: manages
+
+billing.pages.ExpensesPageComponent ..> billing.services.FinancialTransactionService: uses
+billing.pages.ExpensesPageComponent ..> billing.components.ExpenseFormComponent: contains
+billing.pages.ExpensesPageComponent ..> billing.components.ExpenseTableComponent: contains
+
+billing.pages.PaymentsComponent ..> enrollments.StudentService: uses
+billing.pages.PaymentsComponent ..> billing.services.InvoiceService: uses
+billing.pages.PaymentsComponent ..> billing.services.PaymentService: uses
+billing.pages.PaymentsComponent ..> billing.services.FinancialTransactionService: uses
+billing.pages.PaymentsComponent ..> billing.components.StudentSearchComponent: contains
+billing.pages.PaymentsComponent ..> billing.components.StudentStatusComponent: contains
+billing.pages.PaymentsComponent ..> billing.components.PaymentRegistrationComponent: contains
+
+billing.components.ExpenseTableComponent --> billing.model.FinancialTransaction: displays
+billing.components.StudentStatusComponent --> billing.model.Invoice: displays
+billing.components.StudentStatusComponent --> enrollments.Student: references
+billing.components.PaymentRegistrationComponent --> enrollments.Student: references
+billing.components.PaymentRegistrationComponent --> billing.model.Invoice: references
+
+billing.model.FinancialTransaction --> billing.model.PartyType: uses
+billing.model.Invoice --> billing.model.PaymentStatus: uses
+billing.model.Invoice .. enrollments.Student: references
+billing.model.Payment .. billing.model.Invoice: references
+
+' Event relationships
+billing.components.ExpenseFormComponent ..> billing.pages.ExpensesPageComponent: emits events
+billing.components.StudentSearchComponent ..> billing.pages.PaymentsComponent: emits events
+billing.components.StudentStatusComponent ..> billing.pages.PaymentsComponent: emits events
+billing.components.PaymentRegistrationComponent ..> billing.pages.PaymentsComponent: emits events
+
+@enduml

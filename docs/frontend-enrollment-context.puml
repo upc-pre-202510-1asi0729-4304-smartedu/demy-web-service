@@ -1,0 +1,275 @@
+@startuml Enrollment System Class Diagram
+' Style settings
+skinparam classFontSize 14
+skinparam classFontName Arial
+skinparam classAttributeFontSize 12
+skinparam classAttributeFontName Arial
+skinparam packageStyle rectangle
+
+' Core services and interfaces
+package "shared" {
+  package "services" {
+    abstract class BaseService<T> {
+      #resourceEndpoint: string
+      +getAll(): Observable<T[]>
+      +getById(id: string): Observable<T>
+      +create(entity: T): Observable<T>
+      +update(id: string, entity: T): Observable<T>
+      +delete(id: string): Observable<void>
+    }
+  }
+  package "components" {
+    class BaseFormComponent <<Component>> {
+      #isInvalidControl(form: FormGroup, controlName: string): boolean
+      #errorMessagesForControl(form: FormGroup, controlName: string): string
+      -errorMessageForControl(controlName: string, errorKey: string): string
+    }
+  }
+}
+
+' Enrollment module components and services
+package "enrollment" {
+  package "model" {
+    enum Sex {
+      MALE
+      FEMALE
+    }
+
+    enum EnrollmentStatus {
+      ACTIVE
+      CANCELLED
+      COMPLETED
+      DELETED
+    }
+
+    enum PaymentStatus {
+      PENDING
+      PAID
+      REFUNDED
+      PARTIAL
+    }
+
+    class Student <<Entity>> {
+      -id: string
+      -firstName: string
+      -lastName: string
+      -dni: string
+      -sex: Sex
+      -birthDate: Date
+      -address: string
+      -phoneNumber: string
+      +constructor(student: {...})
+    }
+
+    class AcademicPeriod <<Entity>> {
+      -id: string
+      -name: string
+      -academyId: string
+      -startDate: Date
+      -endDate: Date
+      -isActive: boolean
+      +constructor(academicPeriod: {...})
+    }
+
+    class Enrollment <<Entity>> {
+      -id: string
+      -studentId: string
+      -periodId: string
+      -amount: number
+      -enrollmentStatus: EnrollmentStatus
+      -paymentStatus: PaymentStatus
+      -createdAt: Date
+      +constructor(enrollment: {...})
+    }
+  }
+
+  package "services" {
+    class StudentService <<Service>> extends shared.services.BaseService<enrollment.model.Student> {
+      -resourceEndpoint: string
+      +constructor()
+      +getByDni(dni: string): Observable<Student[]>
+    }
+
+    class AcademicPeriodService <<Service>> extends shared.services.BaseService<enrollment.model.AcademicPeriod> {
+      -resourceEndpoint: string
+      +constructor()
+    }
+
+    class EnrollmentService <<Service>> extends shared.services.BaseService<enrollment.model.Enrollment> {
+      -resourceEndpoint: string
+      +constructor()
+    }
+  }
+
+  package "components" {
+    class StudentCreateFormComponent <<Component>> extends shared.components.BaseFormComponent {
+      @Input() student: Student
+      @Input() editMode: boolean
+      @Output() studentAddRequested: EventEmitter<Student>
+      @Output() studentUpdateRequested: EventEmitter<Student>
+      @Output() cancelRequested: EventEmitter<void>
+      @ViewChild('studentForm') studentForm: NgForm
+      #sexOptions: {value: string, viewValue: string}[]
+      +constructor()
+      #resetEditState(): void
+      -isValid(): boolean
+      #isEditMode(): boolean
+      #onSubmit(): void
+      #onCancel(): void
+    }
+
+    class AcademicPeriodCreateFormComponent <<Component>> extends shared.components.BaseFormComponent {
+      @Input() academicPeriod: AcademicPeriod
+      @Input() editMode: boolean
+      @Output() academicPeriodAddRequested: EventEmitter<AcademicPeriod>
+      @Output() academicPeriodUpdateRequested: EventEmitter<AcademicPeriod>
+      @Output() cancelRequested: EventEmitter<void>
+      @ViewChild('academicPeriodForm') academicPeriodForm: NgForm
+      +constructor()
+      #resetEditState(): void
+      -isValid(): boolean
+      #isEditMode(): boolean
+      #onSubmit(): void
+      #onCancel(): void
+    }
+
+    class EnrollmentsCreateFormComponent <<Component>> extends shared.components.BaseFormComponent implements OnInit {
+      @Input() enrollment: Enrollment
+      @Input() editMode: boolean
+      @Output() enrollmentAddRequested: EventEmitter<Enrollment>
+      @Output() enrollmentUpdateRequested: EventEmitter<Enrollment>
+      @Output() cancelRequested: EventEmitter<void>
+      @ViewChild('enrollmentForm') enrollmentForm: NgForm
+      #enrollmentStatusOptions: {value: string, viewValue: string}[]
+      #paymentStatusOptions: {value: string, viewValue: string}[]
+      #studentOptions: Student[]
+      #periodOptions: AcademicPeriod[]
+      -academicPeriodService: AcademicPeriodService
+      -studentService: StudentService
+      +constructor(academicPeriodService: AcademicPeriodService, studentService: StudentService)
+      +ngOnInit(): void
+      -loadAcademicPeriods(): void
+      -loadStudents(): void
+      #resetEditState(): void
+      -isValid(): boolean
+      #isEditMode(): boolean
+      #onSubmit(): void
+      #onCancel(): void
+    }
+  }
+
+  package "pages" {
+    class StudentManagementComponent <<Component>> implements OnInit, AfterViewInit {
+      #studentData: Student
+      #columnsToDisplay: string[]
+      #paginator: MatPaginator
+      #sort: MatSort
+      #editMode: boolean
+      #dataSource: MatTableDataSource<Student>
+      -studentService: StudentService
+      +constructor()
+      +ngOnInit(): void
+      +ngAfterViewInit(): void
+      #onEditItem(item: Student): void
+      #onDeleteItem(item: Student): void
+      #onCancelRequested(): void
+      #onStudentAddRequested(student: Student): void
+      #onStudentUpdateRequested(student: Student): void
+      -resetEditStudentState(): void
+      -getAllStudents(): void
+      -createStudent(): void
+      -updateStudent(): void
+      -deleteStudent(id: string): void
+    }
+
+    class AcademicPeriodManagementComponent <<Component>> implements OnInit, AfterViewInit {
+      #academicPeriodData: AcademicPeriod
+      #columnsToDisplay: string[]
+      #paginator: MatPaginator
+      #sort: MatSort
+      #editMode: boolean
+      #dataSource: MatTableDataSource<AcademicPeriod>
+      -academicPeriodService: AcademicPeriodService
+      +constructor()
+      +ngOnInit(): void
+      +ngAfterViewInit(): void
+      #onEditItem(item: AcademicPeriod): void
+      #onDeleteItem(item: AcademicPeriod): void
+      #onCancelRequested(): void
+      #onAcademicPeriodAddRequested(item: AcademicPeriod): void
+      #onAcademicPeriodUpdateRequested(item: AcademicPeriod): void
+      -resetEditAcademicPeriodState(): void
+      -getAllAcademicPeriods(): void
+      -createAcademicPeriod(): void
+      -updateAcademicPeriod(): void
+      -deleteAcademicPeriod(id: string): void
+    }
+
+    class EnrollmentsManagementComponent <<Component>> implements OnInit, AfterViewInit {
+      #enrollmentData: Enrollment
+      #columnsToDisplay: string[]
+      #paginator: MatPaginator
+      #sort: MatSort
+      #editMode: boolean
+      #dataSource: MatTableDataSource<Enrollment>
+      #studentMap: Map<string, string>
+      #periodMap: Map<string, string>
+      -enrollmentService: EnrollmentService
+      -studentService: StudentService
+      -academicPeriodService: AcademicPeriodService
+      +constructor()
+      +ngOnInit(): void
+      +ngAfterViewInit(): void
+      #onEditItem(item: Enrollment): void
+      #onDeleteItem(item: Enrollment): void
+      #onCancelRequested(): void
+      #onEnrollmentAddRequested(item: Enrollment): void
+      #onEnrollmentUpdateRequested(item: Enrollment): void
+      -resetEditEnrollmentState(): void
+      -getAllEnrollments(): void
+      -loadStudents(): void
+      -loadPeriods(): void
+      -createEnrollment(): void
+      -updateEnrollment(): void
+      -deleteEnrollment(id: string): void
+    }
+  }
+}
+
+' Relationships - Data models
+enrollment.model.Enrollment "1" --> "1" enrollment.model.EnrollmentStatus: has status
+enrollment.model.Enrollment "1" --> "1" enrollment.model.PaymentStatus: has status
+enrollment.model.Student "1" --> "1" enrollment.model.Sex: has sex
+
+' Relationships - Services and Pages
+enrollment.pages.StudentManagementComponent --> enrollment.components.StudentCreateFormComponent: contains
+enrollment.pages.StudentManagementComponent --> enrollment.model.Student: manages
+enrollment.pages.StudentManagementComponent ..> enrollment.services.StudentService: injects
+
+enrollment.pages.AcademicPeriodManagementComponent --> enrollment.components.AcademicPeriodCreateFormComponent: contains
+enrollment.pages.AcademicPeriodManagementComponent --> enrollment.model.AcademicPeriod: manages
+enrollment.pages.AcademicPeriodManagementComponent ..> enrollment.services.AcademicPeriodService: injects
+
+enrollment.pages.EnrollmentsManagementComponent --> enrollment.components.EnrollmentsCreateFormComponent: contains
+enrollment.pages.EnrollmentsManagementComponent --> enrollment.model.Enrollment: manages
+enrollment.pages.EnrollmentsManagementComponent ..> enrollment.services.EnrollmentService: injects
+enrollment.pages.EnrollmentsManagementComponent ..> enrollment.services.StudentService: injects
+enrollment.pages.EnrollmentsManagementComponent ..> enrollment.services.AcademicPeriodService: injects
+
+' Relationships - Components and Services
+enrollment.components.EnrollmentsCreateFormComponent ..> enrollment.services.StudentService: injects
+enrollment.components.EnrollmentsCreateFormComponent ..> enrollment.services.AcademicPeriodService: injects
+enrollment.components.EnrollmentsCreateFormComponent --> enrollment.model.Student: uses
+enrollment.components.EnrollmentsCreateFormComponent --> enrollment.model.AcademicPeriod: uses
+enrollment.components.EnrollmentsCreateFormComponent --> enrollment.model.Enrollment: manages
+
+' Domain relationships
+enrollment.model.Enrollment "*" -- "1" enrollment.model.Student: enrolled
+enrollment.model.Enrollment "*" -- "1" enrollment.model.AcademicPeriod: belongs to
+
+' Event relationships
+enrollment.components.StudentCreateFormComponent ..> enrollment.pages.StudentManagementComponent: emits events
+enrollment.components.AcademicPeriodCreateFormComponent ..> enrollment.pages.AcademicPeriodManagementComponent: emits events
+enrollment.components.EnrollmentsCreateFormComponent ..> enrollment.pages.EnrollmentsManagementComponent: emits events
+
+@enduml
