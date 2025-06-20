@@ -4,10 +4,14 @@ import com.smartedu.demy.platform.billing.domain.model.queries.GetInvoiceByIdQue
 import com.smartedu.demy.platform.billing.domain.model.queries.GetInvoiceByStudentIdQuery;
 import com.smartedu.demy.platform.billing.domain.services.InvoiceCommandService;
 import com.smartedu.demy.platform.billing.domain.services.InvoiceQueryService;
+import com.smartedu.demy.platform.billing.interfaces.rest.resources.AssignPaymentToInvoiceResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.CreateInvoiceResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.InvoiceResource;
+import com.smartedu.demy.platform.billing.interfaces.rest.resources.PaymentResource;
+import com.smartedu.demy.platform.billing.interfaces.rest.transform.AssignPaymentToInvoiceCommandFromResourceAssembler;
 import com.smartedu.demy.platform.billing.interfaces.rest.transform.CreateInvoiceCommandFromResourceAssembler;
 import com.smartedu.demy.platform.billing.interfaces.rest.transform.InvoiceResourceFromEntityAssembler;
+import com.smartedu.demy.platform.billing.interfaces.rest.transform.PaymentResourceFromEntityAssembler;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.StudentId;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -49,5 +53,19 @@ public class InvoiceController {
         var invoiceEntity = invoice.get();
         var invoiceResource = InvoiceResourceFromEntityAssembler.toResourceFromEntity(invoiceEntity);
         return new ResponseEntity<>(invoiceResource, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/{invoiceId}/payments")
+    public ResponseEntity<PaymentResource> assignPaymentToInvoice(
+            @PathVariable Long invoiceId,
+            @RequestBody AssignPaymentToInvoiceResource resource
+            ) {
+        var assignPaymentToInvoiceCommand = AssignPaymentToInvoiceCommandFromResourceAssembler
+                .toCommandFromResource(invoiceId, resource);
+
+        var payment = invoiceCommandService.handle(assignPaymentToInvoiceCommand);
+
+        var paymentResource = PaymentResourceFromEntityAssembler.toResourceFromEntity(payment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(paymentResource);
     }
 }

@@ -11,7 +11,6 @@ import com.smartedu.demy.platform.shared.domain.model.valueobjects.Money;
 import org.springframework.stereotype.Service;
 
 import java.util.Currency;
-import java.util.Optional;
 
 @Service
 public class InvoiceCommandServiceImpl implements InvoiceCommandService {
