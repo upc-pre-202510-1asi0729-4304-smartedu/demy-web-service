@@ -1,0 +1,44 @@
+@startuml
+package demy-platform-backend as demy_platform_backend  {
+    package scheduling {
+        package domain {
+            package model {
+                package aggregates {}
+                package commands {}
+                package queries {}
+                package valueobjects {}
+            }
+            package services {}
+        }
+        package infrastructure {
+            package persistence {
+                    package jpa {}
+            }
+        }
+        package application {
+            package internal {
+                package commandservices {}
+                package queryservices {}
+            }
+        }
+        package interfaces {
+            package rest {
+                package resources {}
+                package transform {}
+                package controllers {}
+            }
+        }
+    }
+}
+package org.springframework.data.domain {}
+package org.hibernate.boot.model.naming {}
+
+demy_platform_backend.scheduling.domain ..> org.springframework.data.domain
+demy_platform_backend.scheduling.infrastructure ..> demy_platform_backend.scheduling.domain
+demy_platform_backend.scheduling.application ..> demy_platform_backend.scheduling.domain
+demy_platform_backend.scheduling.application ..> demy_platform_backend.scheduling.infrastructure
+demy_platform_backend.scheduling.interfaces ..> demy_platform_backend.scheduling.application
+demy_platform_backend.scheduling.interfaces ..> demy_platform_backend.scheduling.domain
+demy_platform_backend.shared.interfaces ..> org.hibernate.boot.model.naming
+
+@enduml
