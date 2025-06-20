@@ -4,6 +4,7 @@ import com.smartedu.demy.platform.iam.domain.services.UserAccountQueryService;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountCommandService;
 import com.smartedu.demy.platform.iam.interfaces.rest.resources.*;
 import com.smartedu.demy.platform.iam.interfaces.rest.transform.UserAccountResourceFromEntityAssembler;
+import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,8 +12,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -96,11 +97,30 @@ public class UserAccountController {
 
     @Operation(summary = "Edit admin profile")
     @PutMapping("/admins/{id}")
-    public ResponseEntity<UserAccountResource> updateAdmin(
+    public ResponseEntity<?> updateAdmin(
             @PathVariable Long id,
             @RequestBody @Valid UpdateAdminResource resource) {
+
+        var user = queryService.findById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found"));
+        }
+
+        if (!user.get().getRole().equals(Roles.ADMIN)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only admins can be updated here"));
+        }
+
         var updated = commandService.updateAdmin(id, resource);
-        return ResponseEntity.ok(UserAccountResourceFromEntityAssembler.toResource(updated));
+        var resourceResult = UserAccountResourceFromEntityAssembler.toResource(updated);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "Admin updated successfully",
+                        "user", resourceResult
+                )
+        );
     }
 
     /* -----------------------------------------------------------
@@ -149,18 +169,50 @@ public class UserAccountController {
 
     @Operation(summary = "Edit teacher profile")
     @PutMapping("/teachers/{id}")
-    public ResponseEntity<UserAccountResource> updateTeacher(
+    public ResponseEntity<?> updateTeacher(
             @PathVariable Long id,
             @RequestBody @Valid UpdateTeacherResource resource) {
+
+        var user = queryService.findById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found"));
+        }
+
+        if (!user.get().getRole().equals(Roles.TEACHER)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only teachers can be updated here"));
+        }
+
         var updated = commandService.updateTeacher(id, resource);
-        return ResponseEntity.ok(UserAccountResourceFromEntityAssembler.toResource(updated));
+        var resourceResult = UserAccountResourceFromEntityAssembler.toResource(updated);
+
+        return ResponseEntity.ok(
+                Map.of(
+                        "message", "Teacher updated successfully",
+                        "user", resourceResult
+                )
+        );
     }
 
     @Operation(summary = "Delete teacher")
     @DeleteMapping("/teachers/{id}")
-    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
+    public ResponseEntity<?> deleteTeacher(@PathVariable Long id) {
+
+        var user = queryService.findById(id);
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", "User not found"));
+        }
+
+        if (!user.get().getRole().equals(Roles.TEACHER)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("message", "Only teachers can be deleted here"));
+        }
+
         commandService.deleteTeacher(id);
-        return ResponseEntity.noContent().build();
+
+        return ResponseEntity.ok(Map.of("message", "Teacher deleted successfully"));
     }
 
 
@@ -172,8 +224,13 @@ public class UserAccountController {
 
     @Operation(summary = "Reset password")
     @PutMapping("/reset-password")
-    public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordResource resource) {
+    public ResponseEntity<Map<String, Object>> resetPassword(@RequestBody ResetPasswordResource resource) {
         commandService.resetPassword(resource);
-        return ResponseEntity.ok("Password reset successfully");
+
+        Map<String, Object> response = new LinkedHashMap<>();
+        response.put("message", "Password reset successfully");
+        response.put("email", resource.email());
+
+        return ResponseEntity.ok(response);
     }
 }
