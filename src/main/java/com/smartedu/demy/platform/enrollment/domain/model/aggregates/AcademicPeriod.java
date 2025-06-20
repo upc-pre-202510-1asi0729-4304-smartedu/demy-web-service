@@ -1,7 +1,6 @@
     package com.smartedu.demy.platform.enrollment.domain.model.aggregates;
 
     import com.smartedu.demy.platform.enrollment.domain.model.commands.CreateAcademicPeriodCommand;
-    import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.AcademyId;
     import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.ActiveStatus;
     import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.PeriodDuration;
     import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
