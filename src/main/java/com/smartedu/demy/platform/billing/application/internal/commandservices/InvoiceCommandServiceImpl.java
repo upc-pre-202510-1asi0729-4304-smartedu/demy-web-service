@@ -46,6 +46,6 @@ public class InvoiceCommandServiceImpl implements InvoiceCommandService {
         invoice.addPayment(payment);
         invoiceRepository.save(invoice);
 
-        return payment;
+        return invoice.getPayments().getLast();
     }
 }
