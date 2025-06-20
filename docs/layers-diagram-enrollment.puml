@@ -1,27 +1,27 @@
 @startuml
-'https://plantuml.com/class-diagram
-
-abstract class AbstractList
-abstract AbstractCollection
-interface List
-interface Collection
-
-List <|-- AbstractList
-Collection <|-- AbstractCollection
-
-Collection <|- List
-AbstractCollection <|- AbstractList
-AbstractList <|-- ArrayList
-
-class ArrayList {
-Object[] elementData
-size()
+package demy-platform-backend as demy_platform_backend  {
+    package enrollments {
+        package domain {}
+        package infrastructure {}
+        package application {}
+        package interfaces {}
+    }
+'    package iam {}
+'    package scheduling {}
+'    package billing {}
+'    package attendance {}
+'    package shared {}
 }
+package org.springframework.data.domain {}
+package org.hibernate.boot.model.naming {}
 
-enum TimeUnit {
-DAYS
-HOURS
-MINUTES
-}
+demy_platform_backend.enrollments.domain ..> org.springframework.data.domain
+demy_platform_backend.enrollments.infrastructure ..> demy_platform_backend.enrollments.domain
+demy_platform_backend.enrollments.application ..> demy_platform_backend.enrollments.domain
+demy_platform_backend.enrollments.application ..> demy_platform_backend.enrollments.infrastructure
+demy_platform_backend.enrollments.interfaces ..> demy_platform_backend.enrollments.application
+demy_platform_backend.enrollments.interfaces ..> demy_platform_backend.enrollments.domain
+demy_platform_backend.shared.interfaces ..> org.hibernate.boot.model.naming
+
 
 @enduml

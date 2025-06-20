@@ -1,10 +1,33 @@
 @startuml
 package demy-platform-backend as demy_platform_backend  {
     package enrollments {
-        package domain {}
-        package infrastructure {}
-        package application {}
-        package interfaces {}
+        package domain {
+            package model {
+                package aggregates {}
+                package commands {}
+                package queries {}
+                package valueobjects {}
+            }
+            package services {}
+        }
+        package infrastructure {
+            package persistence {
+                    package jpa {}
+            }
+        }
+        package application {
+            package internal {
+                package commandservices {}
+                package queryservices {}
+            }
+        }
+        package interfaces {
+            package rest {
+                package resources {}
+                package transform {}
+                package controllers {}
+            }
+        }
     }
 '    package iam {}
 '    package scheduling {}
