@@ -1,6 +1,6 @@
-package com.smartedu.demy.platform.iam.interfaces.rest.resources;
+package com.smartedu.demy.platform.iam.domain.model.commands;
 
-public record SignUpAdminResource(
+public record SignUpAdminCommand(
         String firstName,
         String lastName,
         String email,
