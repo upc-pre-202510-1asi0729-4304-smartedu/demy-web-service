@@ -1,6 +1,7 @@
 package com.smartedu.demy.platform.iam.application.internal.commandservices;
 
 import com.smartedu.demy.platform.iam.application.internal.outboundservices.hashing.HashingService;
+import com.smartedu.demy.platform.iam.application.internal.outboundservices.tokens.TokenService;
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
 import com.smartedu.demy.platform.iam.domain.model.commands.*;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.AccountStatus;
@@ -17,10 +18,16 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
 
     private final UserAccountRepository userAccountRepository;
     private final HashingService hashingService;
+    private final TokenService tokenService;
 
-    public UserAccountCommandServiceImpl(UserAccountRepository userAccountRepository, HashingService hashingService) {
+    public UserAccountCommandServiceImpl(
+            UserAccountRepository userAccountRepository,
+            HashingService hashingService,
+            TokenService tokenService
+    ) {
         this.userAccountRepository = userAccountRepository;
         this.hashingService = hashingService;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -50,7 +57,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         // Validar rol si es necesario
         // if (command.role() != null && user.getRole() != command.role()) { ... }
 
-        String jwtToken = "TODO_generateJWTTokenFor(user)";
+        String jwtToken = tokenService.generateToken(user.getEmail().value());
 
         return ImmutablePair.of(user, jwtToken);
     }
