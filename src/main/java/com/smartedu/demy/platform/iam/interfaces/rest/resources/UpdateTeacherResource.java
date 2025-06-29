@@ -12,7 +12,7 @@ public class UpdateTeacherResource {
     private String firstName;
     private String lastName;
     private String email;
-    private String password; // opcional
+    private String password;
 
     public void applyTo(UserAccount userAccount) {
         userAccount.updateProfile(
