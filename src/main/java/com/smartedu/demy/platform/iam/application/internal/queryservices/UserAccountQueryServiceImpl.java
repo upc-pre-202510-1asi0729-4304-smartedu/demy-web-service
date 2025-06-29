@@ -1,6 +1,9 @@
 package com.smartedu.demy.platform.iam.application.internal.queryservices;
 
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
+import com.smartedu.demy.platform.iam.domain.model.queries.GetAllAdminsQuery;
+import com.smartedu.demy.platform.iam.domain.model.queries.GetAllTeachersQuery;
+import com.smartedu.demy.platform.iam.domain.model.queries.GetUserAccountByIdQuery;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountQueryService;
 import com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositories.UserAccountRepository;
@@ -11,24 +14,25 @@ import java.util.Optional;
 
 @Service
 public class UserAccountQueryServiceImpl implements UserAccountQueryService {
-    private final UserAccountRepository repo;
 
-    public UserAccountQueryServiceImpl(UserAccountRepository repo) {
-        this.repo = repo;
+    private final UserAccountRepository userAccountRepository;
+
+    public UserAccountQueryServiceImpl(UserAccountRepository userAccountRepository) {
+        this.userAccountRepository = userAccountRepository;
     }
 
     @Override
-    public List<UserAccount> findAdmins() {
-        return repo.findByRole(Roles.ADMIN);
+    public List<UserAccount> handle(GetAllAdminsQuery query) {
+        return userAccountRepository.findByRole(Roles.ADMIN);
     }
 
     @Override
-    public List<UserAccount> findTeachers() {
-        return repo.findByRole(Roles.TEACHER);
+    public List<UserAccount> handle(GetAllTeachersQuery query) {
+        return userAccountRepository.findByRole(Roles.TEACHER);
     }
 
     @Override
-    public Optional<UserAccount> findById(Long id) {
-        return repo.findById(id);
+    public Optional<UserAccount> handle(GetUserAccountByIdQuery query) {
+        return userAccountRepository.findById(query.id());
     }
 }
