@@ -1,5 +1,6 @@
 package com.smartedu.demy.platform.iam.application.internal.commandservices;
 
+import com.smartedu.demy.platform.iam.application.internal.outboundservices.hashing.HashingService;
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
 import com.smartedu.demy.platform.iam.domain.model.commands.*;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.AccountStatus;
@@ -8,7 +9,6 @@ import com.smartedu.demy.platform.iam.domain.model.valueobjects.FullName;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountCommandService;
 import com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositories.UserAccountRepository;
-import com.smartedu.demy.platform.shared.domain.model.services.PasswordHasher;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +16,11 @@ import org.springframework.stereotype.Service;
 public class UserAccountCommandServiceImpl implements UserAccountCommandService {
 
     private final UserAccountRepository userAccountRepository;
+    private final HashingService hashingService;
 
-    public UserAccountCommandServiceImpl(UserAccountRepository userAccountRepository) {
+    public UserAccountCommandServiceImpl(UserAccountRepository userAccountRepository, HashingService hashingService) {
         this.userAccountRepository = userAccountRepository;
+        this.hashingService = hashingService;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         var admin = new UserAccount(
                 new FullName(command.firstName(), command.lastName()),
                 new Email(command.email()),
-                PasswordHasher.hash(command.password()),
+                hashingService.encode(command.password()),
                 Roles.ADMIN,
                 AccountStatus.ACTIVE
         );
@@ -42,7 +44,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         var user = userAccountRepository.findByEmail(new Email(command.email()))
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
-        if (!PasswordHasher.matches(command.password(), user.getPasswordHash()))
+        if (!hashingService.matches(command.password(), user.getPasswordHash()))
             throw new RuntimeException("Invalid credentials");
 
         // Validar rol si es necesario
@@ -58,7 +60,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         var teacher = new UserAccount(
                 new FullName(command.firstName(), command.lastName()),
                 new Email(command.email()),
-                PasswordHasher.hash(command.password()),
+                hashingService.encode(command.password()),
                 Roles.TEACHER,
                 AccountStatus.ACTIVE
         );
@@ -86,7 +88,7 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         UserAccount user = userAccountRepository.findByEmail(new Email(command.email()))
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        user.updatePassword(PasswordHasher.hash(command.newPassword()));
+        user.updatePassword(hashingService.encode(command.newPassword()));
         userAccountRepository.save(user);
     }
 }
