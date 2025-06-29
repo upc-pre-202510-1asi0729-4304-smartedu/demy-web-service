@@ -1,4 +1,4 @@
-package com.smartedu.demy.platform.iam.domain.model.resources;
+package com.smartedu.demy.platform.iam.domain.model.valueobjects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
@@ -20,7 +20,6 @@ public record FullName(
             throw new IllegalArgumentException("Last Name must not be null");
         }
     }
-
 
     public String getFullName() {
         return String.format("%s %s", firstName, lastName);

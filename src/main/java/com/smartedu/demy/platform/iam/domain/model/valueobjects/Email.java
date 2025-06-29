@@ -1,4 +1,4 @@
-package com.smartedu.demy.platform.iam.domain.model.resources;
+package com.smartedu.demy.platform.iam.domain.model.valueobjects;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
