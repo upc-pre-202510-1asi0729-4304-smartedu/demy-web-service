@@ -1,20 +1,20 @@
 package com.smartedu.demy.platform.iam.domain.services;
 
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
-import com.smartedu.demy.platform.iam.interfaces.rest.resources.*;
-import com.smartedu.demy.platform.iam.interfaces.rest.resources.UpdateAdminResource;
+import com.smartedu.demy.platform.iam.domain.model.commands.*;
+import org.apache.commons.lang3.tuple.ImmutablePair;
 
 public interface UserAccountCommandService {
-    UserAccount createTeacher(CreateTeacherResource resource);
 
-    UserAccount updateTeacher(Long id, UpdateTeacherResource resource);
-    UserAccount updateAdmin(Long id,  UpdateAdminResource  resource);
+    UserAccount handle(SignUpAdminCommand command);
 
-    UserAccount signInAdmin(SignInAdminResource resource);
-    UserAccount signInTeacher(SignInTeacherResource resource);
-    UserAccount signUpAdmin(SignUpAdminResource resource);
+    ImmutablePair<UserAccount, String> handle(SignInUserAccountCommand command);
 
-    void deleteTeacher(Long id);
+    UserAccount handle(CreateTeacherCommand command);
 
-    void resetPassword(ResetPasswordResource resource);
+    UserAccount handle(UpdateUserAccountCommand command);
+
+    void handle(DeleteUserAccountCommand command);
+
+    void handle(ResetPasswordCommand command);
 }
