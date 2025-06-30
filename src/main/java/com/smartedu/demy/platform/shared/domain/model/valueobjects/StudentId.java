@@ -16,6 +16,5 @@ public record StudentId(
         Objects.requireNonNull(value, "Student ID must not be null");
     }
 
-    // Falta: metodo auxiliar en la entidad Student
-    // para exponer su StudentId (getStudentId())
+
 }

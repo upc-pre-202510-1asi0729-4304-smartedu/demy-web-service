@@ -1,18 +1,17 @@
 package com.smartedu.demy.platform.billing.domain.model.aggregates;
 
+import com.smartedu.demy.platform.billing.domain.model.commands.CreateInvoiceCommand;
 import com.smartedu.demy.platform.billing.domain.model.entities.Payment;
 import com.smartedu.demy.platform.billing.domain.model.valueobjects.InvoiceStatus;
 import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.Money;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.StudentId;
+
 import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
@@ -51,12 +50,12 @@ public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
         this.status = InvoiceStatus.PENDING;
     }
 
-    //public Invoice(CreateInvoiceCommand command) {
-    //    this.studentId = command.studentId();
-    //    this.amount = command.amount();
-    //    this.dueDate = command.dueDate();
-    //    this.status = command.status();
-    //}
+    public Invoice(CreateInvoiceCommand command) {
+        this.studentId = new StudentId(command.studentId());
+        this.amount = new Money(command.amount(), Currency.getInstance(command.currency()));
+        this.dueDate = command.dueDate();
+        this.status = InvoiceStatus.PENDING;
+    }
 
     public void addPayment(Payment payment) {
         Objects.requireNonNull(payment, "Payment must not be null");
