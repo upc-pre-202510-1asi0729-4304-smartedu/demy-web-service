@@ -19,6 +19,9 @@ public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
     @Getter
     private Dni dni;
 
+    @Getter
+    private String name;
+
     @Embedded
     @Getter
     private Money amount;
@@ -39,8 +42,9 @@ public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
         this.status = null;
     }
 
-    public Invoice(Dni dni, Money amount, LocalDate dueDate) {
+    public Invoice(Dni dni, String name, Money amount, LocalDate dueDate) {
         this.dni = Objects.requireNonNull(dni);
+        this.name = name;
         this.amount = Objects.requireNonNull(amount);
         this.dueDate = Objects.requireNonNull(dueDate);
         this.status = InvoiceStatus.PENDING;

@@ -8,6 +8,7 @@ public class InvoiceResourceFromEntityAssembler {
         return new InvoiceResource(
                 entity.getId(),
                 entity.getDni().dni(),
+                entity.getName(),
                 entity.getAmount().amount().toString(),
                 entity.getAmount().currency().toString(),
                 entity.getDueDate(),
