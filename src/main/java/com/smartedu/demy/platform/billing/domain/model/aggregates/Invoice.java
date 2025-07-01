@@ -60,4 +60,8 @@ public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
     public boolean isPaid() {
         return this.status == InvoiceStatus.PAID;
     }
+
+    public void markAsPaid() {
+        this.status = InvoiceStatus.PAID;
+    }
 }
