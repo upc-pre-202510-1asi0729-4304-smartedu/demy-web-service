@@ -1,9 +1,7 @@
 package com.smartedu.demy.platform.iam.interfaces.rest.resources;
 
-public record CreateTeacherResource(
-        String firstName,
-        String lastName,
+public record SignInResource(
         String email,
         String password
-) {
-}
+) {}
+
