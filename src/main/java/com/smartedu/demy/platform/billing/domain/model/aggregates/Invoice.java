@@ -1,11 +1,10 @@
 package com.smartedu.demy.platform.billing.domain.model.aggregates;
 
 import com.smartedu.demy.platform.billing.domain.model.commands.CreateInvoiceCommand;
-import com.smartedu.demy.platform.billing.domain.model.entities.Payment;
 import com.smartedu.demy.platform.billing.domain.model.valueobjects.InvoiceStatus;
 import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.Dni;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.Money;
-import com.smartedu.demy.platform.shared.domain.model.valueobjects.StudentId;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -18,7 +17,7 @@ public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
 
     @Embedded
     @Getter
-    private final StudentId studentId;
+    private Dni dni;
 
     @Embedded
     @Getter
@@ -33,50 +32,28 @@ public class Invoice extends AuditableAbstractAggregateRoot<Invoice> {
     @Getter
     private InvoiceStatus status;
 
-    @OneToMany(mappedBy = "invoice", cascade = CascadeType.ALL, orphanRemoval = true)
-    private final List<Payment> payments = new ArrayList<>();
-
     protected Invoice() {
-        this.studentId = null;
+        this.dni = null;
         this.amount = null;
         this.dueDate = null;
         this.status = null;
     }
 
-    public Invoice(StudentId studentId, Money amount, LocalDate dueDate) {
-        this.studentId = Objects.requireNonNull(studentId);
+    public Invoice(Dni dni, Money amount, LocalDate dueDate) {
+        this.dni = Objects.requireNonNull(dni);
         this.amount = Objects.requireNonNull(amount);
         this.dueDate = Objects.requireNonNull(dueDate);
         this.status = InvoiceStatus.PENDING;
     }
 
     public Invoice(CreateInvoiceCommand command) {
-        this.studentId = new StudentId(command.studentId());
+        this.dni = new Dni(command.dni());
         this.amount = new Money(command.amount(), Currency.getInstance(command.currency()));
         this.dueDate = command.dueDate();
         this.status = InvoiceStatus.PENDING;
     }
 
-    public void addPayment(Payment payment) {
-        Objects.requireNonNull(payment, "Payment must not be null");
-        payment.setInvoice(this);
-        this.payments.add(payment);
-        if (isPaid()) {
-            this.status = InvoiceStatus.PAID;
-        }
-    }
-
-    public Money getPaidAmount() {
-        return payments.stream()
-                .map(Payment::getAmount)
-                .reduce(Money.zero(this.amount.currency()), Money::add);
-    }
-
     public boolean isPaid() {
-        return getPaidAmount().isGreaterThanOrEqual(this.amount);
-    }
-
-    public List<Payment> getPayments() {
-        return Collections.unmodifiableList(this.payments);
+        return this.status == InvoiceStatus.PAID;
     }
 }

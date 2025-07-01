@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public record InvoiceResource(
         Long id,
-        String studentId,
+        String dni,
         String amount,
         String currency,
         LocalDate dueDate,
