@@ -8,9 +8,10 @@ public class PaymentResourceFromEntityAssembler {
         return new PaymentResource(
                 entity.getId(),
                 entity.getAmount().amount(),
-                entity.getAmount().currency().toString(),
+                entity.getAmount().currency().getCurrencyCode(),
                 entity.getMethod().name(),
-                entity.getPaidAt()
+                entity.getPaidAt(),
+                entity.getInvoiceId()
         );
     }
 }
