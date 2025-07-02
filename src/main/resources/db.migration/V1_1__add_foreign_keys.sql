@@ -7,4 +7,3 @@ ALTER TABLE schedules
     ADD CONSTRAINT FK_courses_id
         FOREIGN KEY (course_id)
             REFERENCES courses (id);
-
