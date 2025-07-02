@@ -2,6 +2,7 @@ package com.smartedu.demy.platform.billing.application.internal.commandservices;
 
 import com.smartedu.demy.platform.billing.domain.model.aggregates.FinancialTransaction;
 import com.smartedu.demy.platform.billing.domain.model.commands.CreateFinancialTransactionCommand;
+import com.smartedu.demy.platform.billing.domain.model.commands.RegisterExpenseCommand;
 import com.smartedu.demy.platform.billing.domain.model.commands.RegisterPaymentCommand;
 import com.smartedu.demy.platform.billing.domain.model.entities.Payment;
 import com.smartedu.demy.platform.billing.domain.model.valueobjects.PaymentMethod;
@@ -95,6 +96,33 @@ public class FinancialTransactionCommandServiceImpl implements FinancialTransact
             financialTransactionRepository.save(financialTransaction);
         } catch (Exception e) {
             throw new IllegalArgumentException("Error saving invoice or financial transaction", e);
+        }
+
+        return Optional.of(financialTransaction);
+    }
+
+    @Override
+    public Optional<FinancialTransaction> handle(RegisterExpenseCommand command) {
+        var amount = new Money(command.amount(),  Currency.getInstance(command.currency()));
+        var payment = new Payment(
+                null,
+                amount,
+                PaymentMethod.valueOf(command.method()),
+                command.paidAt()
+        );
+
+        var financialTransaction = new FinancialTransaction(
+                TransactionType.EXPENSE,
+                TransactionCategory.valueOf(command.category()),
+                command.concept(),
+                LocalDateTime.now(),
+                payment
+        );
+
+        try {
+            financialTransactionRepository.save(financialTransaction);
+        }  catch (Exception e) {
+            throw new IllegalArgumentException("Error saving financial transaction", e);
         }
 
         return Optional.of(financialTransaction);
