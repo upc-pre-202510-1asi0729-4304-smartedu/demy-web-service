@@ -19,7 +19,7 @@ public class WeeklySchedule extends AuditableAbstractAggregateRoot<WeeklySchedul
 
     private String name;
 
-    @OneToMany(mappedBy = "weeklySchedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "weeklySchedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Schedule> schedules;
 
     /**
