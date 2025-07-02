@@ -1,0 +1,158 @@
+@startuml Iam Frontend Class Diagram
+
+skinparam classFontSize 14
+skinparam classAttributeFontSize 12
+skinparam packageStyle rectangle
+
+package "shared" {
+    package "services" {
+        abstract class BaseService<T> {
+            #resourceEndpoint : string
+            +getAll()              : Observable<T[]>
+            +getById(id: string)   : Observable<T>
+            +create(entity: T)     : Observable<T>
+            +update(id: string, T) : Observable<T>
+            +delete(id: string)    : Observable<void>
+        }
+    }
+    package "components" {
+        class BaseFormComponent <<Component>> {
+            #isInvalidControl(form: FormGroup, name: string) : boolean
+            #errorMessagesForControl(form: FormGroup, name: string) : string
+        }
+    }
+}
+
+package "iam" {
+
+    package "model" {
+        enum Roles <<Enum>> {
+            ADMIN
+            TEACHER
+        }
+        enum AccountStatus <<Enum>> {
+            ACTIVE
+            INACTIVE
+            BLOCKED
+        }
+        class UserAccount <<Entity>> {
+            id         : string
+            firstName  : string
+            lastName   : string
+            email      : string
+            role       : Roles
+            status     : AccountStatus
+        }
+    }
+
+    package "services" {
+        class AuthService <<Service>> extends shared.services.BaseService<iam.model.UserAccount> {
+            -endpoint = "/api/v1/auth"
+            +login(credentials:{email:string,password:string})   : Observable<UserAccount>
+            +register(dto:{...})                                 : Observable<UserAccount>
+            +recoverPassword(email:string)                       : Observable<void>
+            +resetPassword(token:string,newPass:string)          : Observable<void>
+            +getProfile()                                        : Observable<UserAccount>
+            +updateProfile(dto:Partial<UserAccount>)             : Observable<UserAccount>
+        }
+
+        class TokenInterceptor <<Interceptor>> {
+            -authService : AuthService
+            +intercept(req,next) : Observable<HttpEvent>
+        }
+    }
+
+    package "components" {
+        class LoginFormComponent          <<Component>> extends shared.components.BaseFormComponent {
+            +form : FormGroup
+            @Output() submit : EventEmitter<{email:string,password:string}>
+            +onSubmit()
+        }
+        class RegisterFormComponent       <<Component>> extends shared.components.BaseFormComponent {
+            +form : FormGroup
+            @Output() submit : EventEmitter<{...}>
+            +onSubmit()
+        }
+        class RecoverPasswordFormComponent<<Component>> extends shared.components.BaseFormComponent {
+            +form : FormGroup
+            @Output() submit : EventEmitter<{email:string}>
+            +onSubmit()
+        }
+        class ResetPasswordFormComponent  <<Component>> extends shared.components.BaseFormComponent {
+            @Input() email : string
+            +form : FormGroup
+            @Output() submit : EventEmitter<{newPassword:string}>
+            +onSubmit()
+        }
+        class LanguageSwitcherComponent <<Component>> {
+            +currentLang : Signal<string>
+            +switch(lang:string)
+        }
+    }
+
+package "pages" {
+    class LoginPageComponent <<Component>> {
+        -auth : AuthService
+        +onSubmit()
+    }
+
+    class RegisterPageComponent <<Component>> {
+        -auth : AuthService
+        +onSubmit()
+    }
+
+    class RecoverPasswordPageComponent <<Component>> {
+        -auth : AuthService
+        +onSubmit()
+    }
+
+    class ResetPasswordPageComponent <<Component>> {
+        -auth : AuthService
+        +onSubmit()
+    }
+
+    class ProfilePageComponent <<Component>> {
+        -auth : AuthService
+        +user : Signal<UserAccount>
+    }
+}
+}
+
+iam.pages.LoginPageComponent           ..> iam.components.LoginFormComponent          : contains
+iam.pages.RegisterPageComponent        ..> iam.components.RegisterFormComponent       : contains
+iam.pages.RecoverPasswordPageComponent ..> iam.components.RecoverPasswordFormComponent: contains
+iam.pages.ResetPasswordPageComponent   ..> iam.components.ResetPasswordFormComponent  : contains
+
+' Relaciones entre páginas y LanguageSwitcher
+iam.pages.LoginPageComponent           ..> iam.components.LanguageSwitcherComponent : contains
+iam.pages.RegisterPageComponent        ..> iam.components.LanguageSwitcherComponent : contains
+iam.pages.RecoverPasswordPageComponent ..> iam.components.LanguageSwitcherComponent : contains
+iam.pages.ResetPasswordPageComponent   ..> iam.components.LanguageSwitcherComponent : contains
+iam.pages.ProfilePageComponent         ..> iam.components.LanguageSwitcherComponent : contains
+
+' Relaciones entre páginas y AuthService
+iam.pages.LoginPageComponent           ..> iam.services.AuthService : uses
+iam.pages.RegisterPageComponent        ..> iam.services.AuthService : uses
+iam.pages.RecoverPasswordPageComponent ..> iam.services.AuthService : uses
+iam.pages.ResetPasswordPageComponent   ..> iam.services.AuthService : uses
+iam.pages.ProfilePageComponent         ..> iam.services.AuthService : uses
+
+' Relaciones de eventos IAM components
+iam.components.LoginFormComponent            ..> iam.pages.LoginPageComponent           : emits
+iam.components.RegisterFormComponent         ..> iam.pages.RegisterPageComponent        : emits
+iam.components.RecoverPasswordFormComponent  ..> iam.pages.RecoverPasswordPageComponent: emits
+iam.components.ResetPasswordFormComponent    ..> iam.pages.ResetPasswordPageComponent  : emits
+
+' Relaciones de eventos Enums
+iam.model.UserAccount "1" --> "1" iam.model.Roles : role
+iam.model.UserAccount "1" --> "1" iam.model.AccountStatus : status
+
+
+' Relaciones de UserAccount
+iam.services.AuthService --> iam.model.UserAccount : returns/updates
+iam.pages.ProfilePageComponent --> iam.model.UserAccount : holds
+iam.components.LoginFormComponent ..> iam.model.UserAccount : emits partial
+iam.components.RegisterFormComponent ..> iam.model.UserAccount : emits partial
+iam.components.ResetPasswordFormComponent ..> iam.model.UserAccount : emits partial
+
+@enduml
