@@ -7,7 +7,8 @@ public class InvoiceResourceFromEntityAssembler {
     public static InvoiceResource toResourceFromEntity(Invoice entity) {
         return new InvoiceResource(
                 entity.getId(),
-                entity.getStudentId().value().toString(),
+                entity.getDni().dni(),
+                entity.getName(),
                 entity.getAmount().amount().toString(),
                 entity.getAmount().currency().toString(),
                 entity.getDueDate(),

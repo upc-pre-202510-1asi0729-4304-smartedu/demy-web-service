@@ -1,8 +1,8 @@
 package com.smartedu.demy.platform.billing.application.internal.queryservices;
 
 import com.smartedu.demy.platform.billing.domain.model.aggregates.Invoice;
+import com.smartedu.demy.platform.billing.domain.model.queries.GetAllInvoicesByDniQuery;
 import com.smartedu.demy.platform.billing.domain.model.queries.GetInvoiceByIdQuery;
-import com.smartedu.demy.platform.billing.domain.model.queries.GetInvoiceByStudentIdQuery;
 import com.smartedu.demy.platform.billing.domain.services.InvoiceQueryService;
 import com.smartedu.demy.platform.billing.infrastructure.persistence.jpa.repositories.InvoiceRepository;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ public class InvoiceQueryServiceImpl implements InvoiceQueryService {
     }
 
     @Override
-    public List<Invoice> handle(GetInvoiceByStudentIdQuery query) {
-        return invoiceRepository.findByStudentId(query.studentId());
+    public List<Invoice> handle(GetAllInvoicesByDniQuery query) {
+        return invoiceRepository.findByDni(query.dni());
     }
 }
