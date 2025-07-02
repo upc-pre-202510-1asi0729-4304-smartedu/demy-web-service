@@ -76,7 +76,7 @@ public class OpenApiConfiguration {
         return new OpenAPI()
                 .openapi("3.0.1")
                 .info(info)
-                .servers(List.of(new Server().url("https://demy-web-service-production.up.railway.app")))
+                //.servers(List.of(new Server().url("https://demy-web-service-production.up.railway.app")))
                 //.externalDocs(externalDocs)
                 .addSecurityItem(securityRequirement)
                 .components(new Components()
