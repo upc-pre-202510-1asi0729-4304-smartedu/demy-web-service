@@ -3,9 +3,11 @@ package com.smartedu.demy.platform.billing.interfaces.rest.controllers;
 import com.smartedu.demy.platform.billing.domain.services.FinancialTransactionCommandService;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.CreateFinancialTransactionResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.FinancialTransactionResource;
+import com.smartedu.demy.platform.billing.interfaces.rest.resources.RegisterExpenseResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.RegisterPaymentResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.transform.CreateFinancialTransactionCommandFromResourceAssembler;
 import com.smartedu.demy.platform.billing.interfaces.rest.transform.FinancialTransactionResourceFromEntityAssembler;
+import com.smartedu.demy.platform.billing.interfaces.rest.transform.RegisterExpenseCommandFromResourceAssembler;
 import com.smartedu.demy.platform.billing.interfaces.rest.transform.RegisterPaymentCommandFromResourceAssembler;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
@@ -44,6 +46,16 @@ public class FinancialTransactionsController {
         if (financialTransaction.isEmpty()) return ResponseEntity.badRequest().build();
         var createdFinancialTransaction = financialTransaction.get();
         var financialTransactionResource = FinancialTransactionResourceFromEntityAssembler.toResourceFromEntity(createdFinancialTransaction);
+        return new ResponseEntity<>(financialTransactionResource, HttpStatus.CREATED);
+    }
+
+    @PostMapping("/expenses")
+    public ResponseEntity<FinancialTransactionResource> registerExpense(@RequestBody RegisterExpenseResource resource) {
+        var registerExpenseCommand = RegisterExpenseCommandFromResourceAssembler.toCommandFromResource(resource);
+        var financialTransaction = financialTransactionCommandService.handle(registerExpenseCommand);
+        if (financialTransaction.isEmpty()) return ResponseEntity.badRequest().build();
+        var createdFinancialTransaction = financialTransaction.get();
+        var financialTransactionResource  = FinancialTransactionResourceFromEntityAssembler.toResourceFromEntity(createdFinancialTransaction);
         return new ResponseEntity<>(financialTransactionResource, HttpStatus.CREATED);
     }
 }
