@@ -4,9 +4,9 @@ import com.smartedu.demy.platform.billing.domain.model.commands.CreateInvoiceCom
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.CreateInvoiceResource;
 
 public class CreateInvoiceCommandFromResourceAssembler {
-    public static CreateInvoiceCommand toCommandFromResource(CreateInvoiceResource resource) {
+    public static CreateInvoiceCommand toCommandFromResource(String dni, CreateInvoiceResource resource) {
         return new CreateInvoiceCommand(
-                resource.dni(),
+                dni,
                 resource.amount(),
                 resource.currency(),
                 resource.dueDate()
