@@ -20,11 +20,11 @@ import java.util.List;
 @RestController
 @RequestMapping(value = "/api/v1/academies", produces = MediaType.APPLICATION_JSON_VALUE)
 @Tag(name = "Academy", description = "Academy management endpoints")
-public class AcademyController {
+public class AcademiesController {
 
     private final AcademyQueryServiceImpl queryService;
 
-    public AcademyController(AcademyQueryServiceImpl queryService) {
+    public AcademiesController(AcademyQueryServiceImpl queryService) {
         this.queryService = queryService;
     }
 

@@ -159,6 +159,7 @@ public class UserAccountsController {
     })
 
     @PostMapping("/teachers")
+    //cambiar el map string object
     public ResponseEntity<Map<String, Object>> createTeacher(@RequestBody @Valid CreateTeacherResource resource) {
         var command = CreateTeacherCommandFromResourceAssembler.toCommandFromResource(resource);
         try {
