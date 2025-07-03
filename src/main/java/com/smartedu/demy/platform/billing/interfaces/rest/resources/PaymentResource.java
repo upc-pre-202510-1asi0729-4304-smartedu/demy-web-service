@@ -8,6 +8,7 @@ public record PaymentResource(
         BigDecimal amount,
         String currency,
         String method,
-        LocalDateTime paidAt
+        LocalDateTime paidAt,
+        Long invoiceId
 ) {
 }

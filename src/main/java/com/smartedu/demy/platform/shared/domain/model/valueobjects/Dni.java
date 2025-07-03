@@ -1,4 +1,4 @@
-package com.smartedu.demy.platform.enrollment.domain.model.valueobjects;
+package com.smartedu.demy.platform.shared.domain.model.valueobjects;
 
 import jakarta.persistence.Embeddable;
 
