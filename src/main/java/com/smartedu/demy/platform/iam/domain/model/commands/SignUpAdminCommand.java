@@ -4,6 +4,8 @@ public record SignUpAdminCommand(
         String firstName,
         String lastName,
         String email,
-        String password
+        String password,
+        String academyName,
+        String ruc
 ) {
 }

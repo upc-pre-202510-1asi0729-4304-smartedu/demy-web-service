@@ -9,7 +9,9 @@ public class SignUpAdminCommandFromResourceAssembler {
                 resource.firstName(),
                 resource.lastName(),
                 resource.email(),
-                resource.password()
+                resource.password(),
+                resource.academyName(),
+                resource.ruc()
         );
     }
 }
