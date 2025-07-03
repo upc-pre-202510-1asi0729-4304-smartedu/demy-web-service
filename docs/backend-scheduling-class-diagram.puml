@@ -1,0 +1,516 @@
+@startuml
+package demy-backend as demy_backend {
+    package scheduling {
+        ' Application Layer
+        package application {
+            package internal {
+                package commandservices {
+                    class ClassroomCommandServiceImpl {
+                        - final ClassroomRepository classroomRepository
+                        + ClassroomCommandServiceImpl(ClassroomRepository)
+                        + Long handle(CreateClassroomCommand)
+                        + void handle(DeleteClassroomCommand)
+                        + Optional<Classroom> handle(UpdateClassroomCommand)
+                    }
+                    class CourseCommandServiceImpl {
+                        - final CourseRepository courseRepository
+                        + CourseCommandServiceImpl(CourseRepository)
+                        + Long handle(CreateCourseCommand)
+                        + void handle(DeleteCourseCommand)
+                        + Optional<Course> handle(UpdateCourseCommand)
+                    }
+                    class WeeklyScheduleCommandServiceImpl {
+                        - final WeeklyScheduleRepository weeklyScheduleRepository
+                        + WeeklyScheduleCommandServiceImpl(WeeklyScheduleRepository)
+                        + Long handle(CreateWeeklyScheduleCommand)
+                        + Optional<WeeklySchedule> handle(UpdateWeeklyScheduleNameCommand)
+                        + Optional<WeeklySchedule> handle(AddScheduleToWeeklyCommand)
+                        + Optional<WeeklySchedule> handle(RemoveScheduleFromWeeklyCommand)
+                    }
+                }
+                package queryservices {
+                    class ClassroomQueryServiceImpl {
+                        - final ClassroomRepository classroomRepository
+                        + ClassroomQueryServiceImpl(ClassroomRepository)
+                        + List<Classroom> handle(GetAllClassroomsQuery)
+                        + Optional<Classroom> handle(GetClassroomByIdQuery)
+                    }
+                    class CourseQueryServiceImpl {
+                        - final CourseRepository courseRepository
+                        + CourseQueryServiceImpl(CourseRepository)
+                        + List<Course> handle(GetAllCoursesQuery)
+                        + Optional<Course> handle(GetCourseByIdQuery)
+                    }
+                    class WeeklyScheduleQueryServiceImpl {
+                        - final WeeklyScheduleRepository weeklyScheduleRepository
+                        + WeeklyScheduleQueryServiceImpl(WeeklyScheduleRepository)
+                        + List<WeeklySchedule> handle(GetAllWeeklySchedulesQuery)
+                        + Optional<WeeklySchedule> handle(GetWeeklyScheduleByIdQuery)
+                    }
+                }
+            }
+        }
+        ' Domain Layer
+        package domain {
+            package model {
+                package aggregates {
+                    class Classroom <<AggregateRoot>> {
+                        - String code
+                        - Integer capacity
+                        - String campus
+                        # Classroom()
+                        + Classroom(String, Integer, String)
+                        + Classroom(CreateClassroomCommand)
+                        + Classroom updateClassroom(String, Integer, String)
+                        + Classroom updateClassroom(UpdateClassroomCommand)
+                    }
+                    class Course <<AggregateRoot>> {
+                        - String name
+                        - String code
+                        - String description
+                        # Course()
+                        + Course(String, String, String)
+                        + Course(CreateCourseCommand)
+                        + Course updateCourse(String, String, String)
+                        + Course updateCourse(UpdateCourseCommand)
+                    }
+                    class WeeklySchedule <<AggregateRoot>> {
+                        - String name
+                        - List<Schedule> schedules
+                        # WeeklySchedule()
+                        + WeeklySchedule(String)
+                        + WeeklySchedule(CreateWeeklyScheduleCommand)
+                        + void updateName(String)
+                        + void addSchedule(Schedule)
+                        + void addSchedule(String, String, DayOfWeek, Long, Long)
+                        + void removeSchedule(Long)
+                        + boolean hasConflicts()
+                        + List<ScheduleConflict> getConflicts()
+                        - boolean hasConflictWith(Schedule)
+                    }
+                }
+                package entities {
+                    class Schedule <<Entity>> {
+                        - String startTime
+                        - String endTime
+                        - DayOfWeek dayOfWeek
+                        - Long courseId
+                        - Long classroomId
+                        - WeeklySchedule weeklySchedule
+                        # Schedule()
+                        + Schedule(String, String, DayOfWeek, Long, Long)
+                        + boolean conflictsWith(Schedule)
+                        + void setWeeklySchedule(WeeklySchedule)
+                    }
+                }
+                package valueobjects {
+                    class ClassroomId <<ValueObject>> {
+                        - Long id
+                        + ClassroomId()
+                        + ClassroomId(Long)
+                    }
+                    class CourseId <<ValueObject>> {
+                        - Long id
+                        + CourseId()
+                        + CourseId(Long)
+                    }
+                    class TimeRange <<ValueObject>> {
+                        - LocalTime startTime
+                        - LocalTime endTime
+                        + TimeRange(LocalTime, LocalTime)
+                        + TimeRange(String, String)
+                        + boolean overlapsWith(TimeRange)
+                    }
+                    enum DayOfWeek <<ValueObject>> {
+                        MONDAY
+                        TUESDAY
+                        WEDNESDAY
+                        THURSDAY
+                        FRIDAY
+                        SATURDAY
+                        SUNDAY
+                    }
+                    class ScheduleConflict <<ValueObject>> {
+                        - Schedule schedule1
+                        - Schedule schedule2
+                    }
+                }
+                package commands {
+                    class CreateClassroomCommand <<record>> {
+                        - String code
+                        - Integer capacity
+                        - String campus
+                    }
+                    class UpdateClassroomCommand <<record>> {
+                        - Long classroomId
+                        - String code
+                        - Integer capacity
+                        - String campus
+                    }
+                    class DeleteClassroomCommand <<record>> {
+                        - Long classroomId
+                    }
+                    class CreateCourseCommand <<record>> {
+                        - String name
+                        - String code
+                        - String description
+                    }
+                    class UpdateCourseCommand <<record>> {
+                        - Long courseId
+                        - String name
+                        - String code
+                        - String description
+                    }
+                    class DeleteCourseCommand <<record>> {
+                        - Long courseId
+                    }
+                    class CreateWeeklyScheduleCommand <<record>> {
+                        - String name
+                    }
+                    class UpdateWeeklyScheduleNameCommand <<record>> {
+                        - Long weeklyScheduleId
+                        - String name
+                    }
+                    class AddScheduleToWeeklyCommand <<record>> {
+                        - Long weeklyScheduleId
+                        - String startTime
+                        - String endTime
+                        - String dayOfWeek
+                        - Long courseId
+                        - Long classroomId
+                    }
+                    class RemoveScheduleFromWeeklyCommand <<record>> {
+                        - Long weeklyScheduleId
+                        - Long scheduleId
+                    }
+                }
+                package queries {
+                    class GetAllClassroomsQuery <<record>> {}
+                    class GetClassroomByIdQuery <<record>> {
+                        - Long classroomId
+                    }
+                    class GetAllCoursesQuery <<record>> {}
+                    class GetCourseByIdQuery <<record>> {
+                        - Long courseId
+                    }
+                    class GetAllWeeklySchedulesQuery <<record>> {}
+                    class GetWeeklyScheduleByIdQuery <<record>> {
+                        - Long weeklyScheduleId
+                    }
+                }
+                package services {
+                    interface ClassroomCommandService {
+                        + Long handle(CreateClassroomCommand)
+                        + void handle(DeleteClassroomCommand)
+                        + Optional<Classroom> handle(UpdateClassroomCommand)
+                    }
+                    interface ClassroomQueryService {
+                        + List<Classroom> handle(GetAllClassroomsQuery)
+                        + Optional<Classroom> handle(GetClassroomByIdQuery)
+                    }
+                    interface CourseCommandService {
+                        + Long handle(CreateCourseCommand)
+                        + void handle(DeleteCourseCommand)
+                        + Optional<Course> handle(UpdateCourseCommand)
+                    }
+                    interface CourseQueryService {
+                        + List<Course> handle(GetAllCoursesQuery)
+                        + Optional<Course> handle(GetCourseByIdQuery)
+                    }
+                    interface WeeklyScheduleCommandService {
+                        + Long handle(CreateWeeklyScheduleCommand)
+                        + Optional<WeeklySchedule> handle(UpdateWeeklyScheduleNameCommand)
+                        + Optional<WeeklySchedule> handle(AddScheduleToWeeklyCommand)
+                        + Optional<WeeklySchedule> handle(RemoveScheduleFromWeeklyCommand)
+                    }
+                    interface WeeklyScheduleQueryService {
+                        + List<WeeklySchedule> handle(GetAllWeeklySchedulesQuery)
+                        + Optional<WeeklySchedule> handle(GetWeeklyScheduleByIdQuery)
+                    }
+                }
+            }
+        }
+        ' Infrastructure Layer
+        package infrastructure {
+            package persistence {
+                package jpa {
+                    package repositories {
+                        interface ClassroomRepository {
+                            + boolean existsByCode(String)
+                            + Optional<Classroom> findByCode(String)
+                            + List<Classroom> findByCampus(String)
+                        }
+                        interface CourseRepository {
+                            + boolean existsByCode(String)
+                            + Optional<Course> findByCode(String)
+                            + List<Course> findByNameContaining(String)
+                        }
+                        interface WeeklyScheduleRepository {
+                            + boolean existsByName(String)
+                            + Optional<WeeklySchedule> findByName(String)
+                        }
+                    }
+                }
+            }
+        }
+        ' Interfaces Layer (REST)
+        package interfaces {
+            package rest {
+                package controllers {
+                    class ClassroomController {
+                        - final ClassroomCommandService cmdSvc
+                        - final ClassroomQueryService qrySvc
+                        + createClassroom(CreateClassroomResource)
+                        + getAllClassrooms()
+                        + getClassroomById(Long)
+                        + updateClassroom(Long, UpdateClassroomResource)
+                        + deleteClassroom(Long)
+                    }
+                    class CourseController {
+                        - final CourseCommandService cmdSvc
+                        - final CourseQueryService qrySvc
+                        + createCourse(CreateCourseResource)
+                        + getAllCourses()
+                        + getCourseById(Long)
+                        + updateCourse(Long, UpdateCourseResource)
+                        + deleteCourse(Long)
+                    }
+                    class WeeklyScheduleController {
+                        - final WeeklyScheduleCommandService cmdSvc
+                        - final WeeklyScheduleQueryService qrySvc
+                        + createWeeklySchedule(CreateWeeklyScheduleResource)
+                        + getAllWeeklySchedules()
+                        + getWeeklyScheduleById(Long)
+                        + updateWeeklyScheduleName(Long, UpdateWeeklyScheduleNameResource)
+                        + addScheduleToWeekly(Long, AddScheduleToWeeklyResource)
+                        + removeScheduleFromWeekly(Long, Long)
+                    }
+                }
+                package resources {
+                    class ClassroomResource <<record>> {
+                        - Long classroomId
+                        - String code
+                        - Integer capacity
+                        - String campus
+                    }
+                    class CreateClassroomResource <<record>> {
+                        - String code
+                        - Integer capacity
+                        - String campus
+                    }
+                    class UpdateClassroomResource <<record>> {
+                        - String code
+                        - Integer capacity
+                        - String campus
+                    }
+                    class CourseResource <<record>> {
+                        - Long courseId
+                        - String name
+                        - String code
+                        - String description
+                    }
+                    class CreateCourseResource <<record>> {
+                        - String name
+                        - String code
+                        - String description
+                    }
+                    class UpdateCourseResource <<record>> {
+                        - String name
+                        - String code
+                        - String description
+                    }
+                    class WeeklyScheduleResource <<record>> {
+                        - Long weeklyScheduleId
+                        - String name
+                        - List<ScheduleResource> schedules
+                    }
+                    class CreateWeeklyScheduleResource <<record>> {
+                        - String name
+                    }
+                    class UpdateWeeklyScheduleNameResource <<record>> {
+                        - String name
+                    }
+                    class AddScheduleToWeeklyResource <<record>> {
+                        - String startTime
+                        - String endTime
+                        - String dayOfWeek
+                        - Long courseId
+                        - Long classroomId
+                    }
+                    class ScheduleResource <<record>> {
+                        - Long scheduleId
+                        - String startTime
+                        - String endTime
+                        - String dayOfWeek
+                        - Long courseId
+                        - Long classroomId
+                    }
+                }
+                package transform {
+                    class ClassroomResourceFromEntityAssembler {
+                        + static toResource(Classroom)
+                    }
+                    class CreateClassroomCommandFromResourceAssembler {
+                        + static toCommand(CreateClassroomResource)
+                    }
+                    class UpdateClassroomCommandFromResourceAssembler {
+                        + static toCommand(Long, UpdateClassroomResource)
+                    }
+                    class CourseResourceFromEntityAssembler {
+                        + static toResource(Course)
+                    }
+                    class CreateCourseCommandFromResourceAssembler {
+                        + static toCommand(CreateCourseResource)
+                    }
+                    class UpdateCourseCommandFromResourceAssembler {
+                        + static toCommand(Long, UpdateCourseResource)
+                    }
+                    class WeeklyScheduleResourceFromEntityAssembler {
+                        + static toResource(WeeklySchedule)
+                    }
+                    class CreateWeeklyScheduleCommandFromResourceAssembler {
+                        + static toCommand(CreateWeeklyScheduleResource)
+                    }
+                    class UpdateWeeklyScheduleNameCommandFromResourceAssembler {
+                        + static toCommand(Long, UpdateWeeklyScheduleNameResource)
+                    }
+                    class AddScheduleToWeeklyCommandFromResourceAssembler {
+                        + static toCommand(Long, AddScheduleToWeeklyResource)
+                    }
+                    class ScheduleResourceFromEntityAssembler {
+                        + static toResource(Schedule)
+                    }
+                }
+            }
+        }
+    }
+}
+
+' Shared Domain & Infrastructure
+package shared {
+    package domain {
+        package model {
+            package aggregates {
+                class AuditableAbstractAggregateRoot <<abstract>> {
+                    - Long id
+                    - Date createdAt
+                    - Date updatedAt
+                    + void addDomainEvent(Object)
+                }
+            }
+        }
+    }
+}
+
+' Spring & Hibernate Types
+package org.springframework.data.domain {
+    class AbstractAggregateRoot {}
+}
+package org.springframework.data.jpa.repository {
+    interface JpaRepository {}
+}
+
+' Relationships: Service Impl to Service & Repository
+ClassroomCommandServiceImpl ..|> ClassroomCommandService
+ClassroomCommandServiceImpl --> ClassroomRepository
+CourseCommandServiceImpl ..|> CourseCommandService
+CourseCommandServiceImpl --> CourseRepository
+WeeklyScheduleCommandServiceImpl ..|> WeeklyScheduleCommandService
+WeeklyScheduleCommandServiceImpl --> WeeklyScheduleRepository
+
+ClassroomQueryServiceImpl ..|> ClassroomQueryService
+ClassroomQueryServiceImpl --> ClassroomRepository
+CourseQueryServiceImpl ..|> CourseQueryService
+CourseQueryServiceImpl --> CourseRepository
+WeeklyScheduleQueryServiceImpl ..|> WeeklyScheduleQueryService
+WeeklyScheduleQueryServiceImpl --> WeeklyScheduleRepository
+
+' Command & Query Dependencies
+ClassroomCommandService ..> CreateClassroomCommand
+ClassroomCommandService ..> DeleteClassroomCommand
+ClassroomCommandService ..> UpdateClassroomCommand
+ClassroomQueryService ..> GetAllClassroomsQuery
+ClassroomQueryService ..> GetClassroomByIdQuery
+
+CourseCommandService ..> CreateCourseCommand
+CourseCommandService ..> DeleteCourseCommand
+CourseCommandService ..> UpdateCourseCommand
+CourseQueryService ..> GetAllCoursesQuery
+CourseQueryService ..> GetCourseByIdQuery
+
+WeeklyScheduleCommandService ..> CreateWeeklyScheduleCommand
+WeeklyScheduleCommandService ..> UpdateWeeklyScheduleNameCommand
+WeeklyScheduleCommandService ..> AddScheduleToWeeklyCommand
+WeeklyScheduleCommandService ..> RemoveScheduleFromWeeklyCommand
+WeeklyScheduleQueryService ..> GetAllWeeklySchedulesQuery
+WeeklyScheduleQueryService ..> GetWeeklyScheduleByIdQuery
+
+' Aggregates Commands
+Classroom ..> CreateClassroomCommand
+Classroom ..> UpdateClassroomCommand
+Course ..> CreateCourseCommand
+Course ..> UpdateCourseCommand
+WeeklySchedule ..> CreateWeeklyScheduleCommand
+WeeklySchedule ..> UpdateWeeklyScheduleNameCommand
+WeeklySchedule ..> AddScheduleToWeeklyCommand
+WeeklySchedule ..> RemoveScheduleFromWeeklyCommand
+
+' Repository Dependencies
+ClassroomRepository --|> JpaRepository
+ClassroomRepository ..> Classroom
+CourseRepository --|> JpaRepository
+CourseRepository ..> Course
+WeeklyScheduleRepository --|> JpaRepository
+WeeklyScheduleRepository ..> WeeklySchedule
+
+' Value Object Usage
+Schedule --> ClassroomId
+Schedule --> CourseId
+Schedule --> DayOfWeek
+Schedule --> TimeRange
+WeeklySchedule --> ScheduleConflict
+
+' Aggregates & Entities Relationships
+WeeklySchedule ||--o{ Schedule
+
+' Inheritance
+Classroom --|> AuditableAbstractAggregateRoot
+Course --|> AuditableAbstractAggregateRoot
+WeeklySchedule --|> AuditableAbstractAggregateRoot
+AuditableAbstractAggregateRoot --|> AbstractAggregateRoot
+
+' Controllers & Services
+ClassroomController ..> ClassroomCommandService
+ClassroomController ..> ClassroomQueryService
+CourseController ..> CourseCommandService
+CourseController ..> CourseQueryService
+WeeklyScheduleController ..> WeeklyScheduleCommandService
+WeeklyScheduleController ..> WeeklyScheduleQueryService
+
+' Controllers & Resources & Assemblers
+ClassroomController ..> CreateClassroomCommandFromResourceAssembler
+ClassroomController ..> UpdateClassroomCommandFromResourceAssembler
+ClassroomController ..> ClassroomResourceFromEntityAssembler
+ClassroomController ..> CreateClassroomResource
+ClassroomController ..> UpdateClassroomResource
+ClassroomController ..> ClassroomResource
+
+CourseController ..> CreateCourseCommandFromResourceAssembler
+CourseController ..> UpdateCourseCommandFromResourceAssembler
+CourseController ..> CourseResourceFromEntityAssembler
+CourseController ..> CreateCourseResource
+CourseController ..> UpdateCourseResource
+CourseController ..> CourseResource
+
+WeeklyScheduleController ..> CreateWeeklyScheduleCommandFromResourceAssembler
+WeeklyScheduleController ..> UpdateWeeklyScheduleNameCommandFromResourceAssembler
+WeeklyScheduleController ..> AddScheduleToWeeklyCommandFromResourceAssembler
+WeeklyScheduleController ..> WeeklyScheduleResourceFromEntityAssembler
+WeeklyScheduleController ..> ScheduleResourceFromEntityAssembler
+WeeklyScheduleController ..> CreateWeeklyScheduleResource
+WeeklyScheduleController ..> UpdateWeeklyScheduleNameResource
+WeeklyScheduleController ..> AddScheduleToWeeklyResource
+WeeklyScheduleController ..> WeeklyScheduleResource
+WeeklyScheduleController ..> ScheduleResource
+
+@enduml

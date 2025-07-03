@@ -2,6 +2,7 @@ package com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositori
 
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Email;
+import com.smartedu.demy.platform.iam.domain.model.valueobjects.FullName;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,6 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     List<UserAccount> findByRole(Roles roles);
 
     Optional<UserAccount> findByEmail(Email email);
+
+    Optional<UserAccount> findByFullName(FullName fullName);
 }
