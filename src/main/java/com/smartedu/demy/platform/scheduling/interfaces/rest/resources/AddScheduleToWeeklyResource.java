@@ -5,6 +5,8 @@ public record AddScheduleToWeeklyResource(
         String endTime,
         String dayOfWeek,
         Long courseId,
-        Long classroomId
+        Long classroomId,
+        String teacherFirstName,
+        String teacherLastName
 ) {
 }
