@@ -4,6 +4,7 @@ import com.smartedu.demy.platform.scheduling.domain.model.commands.CreateWeeklyS
 import com.smartedu.demy.platform.scheduling.domain.model.entities.Schedule;
 import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.DayOfWeek;
 import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -19,7 +20,7 @@ public class WeeklySchedule extends AuditableAbstractAggregateRoot<WeeklySchedul
 
     private String name;
 
-    @OneToMany(mappedBy = "weeklySchedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "weeklySchedule", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Schedule> schedules;
 
     /**
@@ -69,9 +70,21 @@ public class WeeklySchedule extends AuditableAbstractAggregateRoot<WeeklySchedul
             throw new IllegalArgumentException("Schedule conflicts with existing schedule in the same classroom and time slot");
         }
 
-        schedule.setWeeklySchedule(this);
         schedules.add(schedule);
     }
+
+//    /**
+//     * Add schedule with parameters
+//     * @param startTime Start time
+//     * @param endTime End time
+//     * @param dayOfWeek Day of week
+//     * @param courseId Course ID
+//     * @param classroomId Classroom ID
+//     */
+//    public void addSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId) {
+//        var schedule = new Schedule(startTime, endTime, dayOfWeek, courseId, classroomId);
+//        schedules.add(schedule);
+//    }
 
     /**
      * Add schedule with parameters
@@ -80,9 +93,11 @@ public class WeeklySchedule extends AuditableAbstractAggregateRoot<WeeklySchedul
      * @param dayOfWeek Day of week
      * @param courseId Course ID
      * @param classroomId Classroom ID
+     * @param teacherId Teacher ID
      */
-    public void addSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId) {
-        var schedule = new Schedule(startTime, endTime, dayOfWeek, courseId, classroomId);
+    public void addSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId, Long teacherId) {
+        var schedule = new Schedule(startTime, endTime, dayOfWeek, courseId, classroomId, teacherId);
+
         schedule.setWeeklySchedule(this);
         schedules.add(schedule);
     }
