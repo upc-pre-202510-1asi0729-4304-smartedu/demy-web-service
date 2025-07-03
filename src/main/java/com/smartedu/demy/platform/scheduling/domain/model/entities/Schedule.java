@@ -6,6 +6,7 @@ import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.CourseId;
 import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.DayOfWeek;
 import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.TimeRange;
 import com.smartedu.demy.platform.shared.domain.model.entities.AuditableModel;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -40,6 +41,12 @@ public class Schedule extends AuditableModel {
     @JoinColumn(nullable = false)
     private WeeklySchedule weeklySchedule;
 
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "value", column = @Column(name = "teacher_id"))
+    })
+    private UserId teacherId;
+
     /**
      * Default constructor
      */
@@ -51,12 +58,14 @@ public class Schedule extends AuditableModel {
      * @param dayOfWeek Day of week
      * @param courseId Course ID
      * @param classroomId Classroom ID
+     * @param teacherId Teacher ID
      */
-    public Schedule(TimeRange timeRange, DayOfWeek dayOfWeek, CourseId courseId, ClassroomId classroomId) {
+    public Schedule(TimeRange timeRange, DayOfWeek dayOfWeek, CourseId courseId, ClassroomId classroomId, UserId teacherId) {
         this.timeRange = timeRange;
         this.dayOfWeek = dayOfWeek;
         this.courseId = courseId;
         this.classroomId = classroomId;
+        this.teacherId = teacherId;
         validateSchedule();
     }
 
@@ -67,9 +76,10 @@ public class Schedule extends AuditableModel {
      * @param dayOfWeek Day of week
      * @param courseId Course ID
      * @param classroomId Classroom ID
+     * @param teacherId Teacher ID
      */
-    public Schedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId) {
-        this(new TimeRange(startTime, endTime), dayOfWeek, new CourseId(courseId), new ClassroomId(classroomId));
+    public Schedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId, Long teacherId) {
+        this(new TimeRange(startTime, endTime), dayOfWeek, new CourseId(courseId), new ClassroomId(classroomId), new UserId(teacherId));
     }
 
     /**
@@ -78,12 +88,14 @@ public class Schedule extends AuditableModel {
      * @param dayOfWeek Day of week
      * @param courseId Course ID
      * @param classroomId Classroom ID
+     * @param teacherId Teacher ID
      */
-    public void updateSchedule(TimeRange timeRange, DayOfWeek dayOfWeek, CourseId courseId, ClassroomId classroomId) {
+    public void updateSchedule(TimeRange timeRange, DayOfWeek dayOfWeek, CourseId courseId, ClassroomId classroomId, UserId teacherId) {
         this.timeRange = timeRange;
         this.dayOfWeek = dayOfWeek;
         this.courseId = courseId;
         this.classroomId = classroomId;
+        this.teacherId = teacherId;
         validateSchedule();
     }
 
@@ -94,10 +106,13 @@ public class Schedule extends AuditableModel {
      * @param dayOfWeek Day of week
      * @param courseId Course ID
      * @param classroomId Classroom ID
+     * @param teacherId Teacher ID
      */
-    public void updateSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId) {
-        updateSchedule(new TimeRange(startTime, endTime), dayOfWeek, new CourseId(courseId), new ClassroomId(classroomId));
+    public void updateSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId, Long teacherId) {
+        updateSchedule(new TimeRange(startTime, endTime), dayOfWeek, new CourseId(courseId), new ClassroomId(classroomId), new UserId(teacherId));
     }
+
+    public void setWeeklySchedule(WeeklySchedule weeklySchedule) { this.weeklySchedule = weeklySchedule; }
 
     /**
      * Checks if this schedule conflicts with another schedule
@@ -113,9 +128,6 @@ public class Schedule extends AuditableModel {
     }
 
 
-    // Setters
-    public void setWeeklySchedule(WeeklySchedule weeklySchedule) { this.weeklySchedule = weeklySchedule; }
-
     private void validateSchedule() {
         if (timeRange == null) {
             throw new IllegalArgumentException("Time range must not be null");
@@ -128,6 +140,9 @@ public class Schedule extends AuditableModel {
         }
         if (classroomId == null) {
             throw new IllegalArgumentException("Classroom ID must not be null");
+        }
+        if (teacherId == null) {
+            throw new IllegalArgumentException("Teacher ID must not be null");
         }
     }
 }

@@ -6,6 +6,7 @@ public record ScheduleResource(
         String endTime,
         String dayOfWeek,
         Long courseId,
-        Long classroomId
+        Long classroomId,
+        Long teacherId
 ) {
 }
