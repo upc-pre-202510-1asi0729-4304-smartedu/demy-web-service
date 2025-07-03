@@ -4,11 +4,13 @@ import com.smartedu.demy.platform.iam.application.internal.outboundservices.hash
 import com.smartedu.demy.platform.iam.application.internal.outboundservices.tokens.TokenService;
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
 import com.smartedu.demy.platform.iam.domain.model.commands.*;
+import com.smartedu.demy.platform.iam.domain.model.aggregates.Academy;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.AccountStatus;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Email;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.FullName;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountCommandService;
+import com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositories.AcademyRepository;
 import com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositories.UserAccountRepository;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
@@ -19,15 +21,18 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
     private final UserAccountRepository userAccountRepository;
     private final HashingService hashingService;
     private final TokenService tokenService;
+    private final AcademyRepository academyRepository;
 
     public UserAccountCommandServiceImpl(
             UserAccountRepository userAccountRepository,
             HashingService hashingService,
-            TokenService tokenService
+            TokenService tokenService,
+            AcademyRepository academyRepository
     ) {
         this.userAccountRepository = userAccountRepository;
         this.hashingService = hashingService;
         this.tokenService = tokenService;
+        this.academyRepository = academyRepository;
     }
 
     @Override
@@ -35,6 +40,9 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         userAccountRepository.findByEmail(new Email(command.email()))
                 .ifPresent(u -> { throw new RuntimeException("Email already registered"); });
 
+        if (command.email() == null || command.email().trim().isEmpty()) {
+            throw new RuntimeException("Invalid input");
+        }
         var admin = new UserAccount(
                 new FullName(command.firstName(), command.lastName()),
                 new Email(command.email()),
@@ -43,20 +51,31 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
                 AccountStatus.ACTIVE
         );
 
-        return userAccountRepository.save(admin);
+        var savedAdmin = userAccountRepository.save(admin);
+
+        var academy = new Academy(
+                savedAdmin.getUserId(),
+                command.academyName(),
+                command.ruc()
+        );
+
+        academyRepository.save(academy);
+        return savedAdmin;
     }
 
     @Override
     public ImmutablePair<UserAccount, String> handle(SignInUserAccountCommand command) {
-        var user = userAccountRepository.findByEmail(new Email(command.email()))
-                .orElseThrow(() -> new RuntimeException("Invalid credentials"));
+        var optionalUser = userAccountRepository.findByEmail(new Email(command.email()));
 
-        if (!hashingService.matches(command.password(), user.getPasswordHash()))
-            throw new RuntimeException("Invalid credentials");
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found");
+        }
 
-        // Validar rol si es necesario
-        // if (command.role() != null && user.getRole() != command.role()) { ... }
+        var user = optionalUser.get();
 
+        if (!hashingService.matches(command.password(), user.getPasswordHash())) {
+            throw new RuntimeException("Invalid password");
+        }
         String jwtToken = tokenService.generateToken(user.getEmail().value());
 
         return ImmutablePair.of(user, jwtToken);
@@ -64,7 +83,15 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
 
     @Override
     public UserAccount handle(CreateTeacherCommand command) {
+
+        if (command.email() == null || command.email().trim().isEmpty()) {
+            throw new RuntimeException("Invalid input");
+        }
+
+        userAccountRepository.findByEmail(new Email(command.email()))
+                .ifPresent(u -> { throw new RuntimeException("Email already registered"); });
         var teacher = new UserAccount(
+
                 new FullName(command.firstName(), command.lastName()),
                 new Email(command.email()),
                 hashingService.encode(command.password()),

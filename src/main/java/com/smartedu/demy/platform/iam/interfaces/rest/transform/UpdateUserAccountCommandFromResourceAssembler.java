@@ -5,9 +5,9 @@ import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.interfaces.rest.resources.UpdateUserAccountResource;
 
 public class UpdateUserAccountCommandFromResourceAssembler {
-    public static UpdateUserAccountCommand toCommandFromResource(UpdateUserAccountResource resource) {
+    public static UpdateUserAccountCommand toCommandFromResource(Long id,UpdateUserAccountResource resource) {
         return new UpdateUserAccountCommand(
-                resource.id(),
+                id,
                 resource.firstName(),
                 resource.lastName(),
                 resource.email(),
