@@ -17,7 +17,9 @@ public class AddScheduleToWeeklyCommandFromResourceAssembler {
                 resource.endTime(),
                 resource.dayOfWeek(),
                 resource.courseId(),
-                resource.classroomId()
+                resource.classroomId(),
+                resource.teacherFirstName(),
+                resource.teacherLastName()
         );
     }
 }
