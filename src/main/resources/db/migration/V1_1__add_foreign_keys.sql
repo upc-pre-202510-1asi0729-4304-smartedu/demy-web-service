@@ -6,3 +6,7 @@ ALTER TABLE schedules
     ADD CONSTRAINT FK_courses_id
         FOREIGN KEY (course_id)
             REFERENCES courses (id);
+ALTER TABLE schedules
+    ADD CONSTRAINT FK_user_accounts_id
+        FOREIGN KEY (teacher_id)
+            REFERENCES user_accounts (id);
