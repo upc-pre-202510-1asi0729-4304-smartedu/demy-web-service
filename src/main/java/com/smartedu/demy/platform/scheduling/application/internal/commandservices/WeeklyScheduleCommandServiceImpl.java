@@ -1,5 +1,6 @@
 package com.smartedu.demy.platform.scheduling.application.internal.commandservices;
 
+import com.smartedu.demy.platform.scheduling.application.internal.outboundservices.acl.ExternalIamService;
 import com.smartedu.demy.platform.scheduling.domain.model.aggregates.WeeklySchedule;
 import com.smartedu.demy.platform.scheduling.domain.model.commands.AddScheduleToWeeklyCommand;
 import com.smartedu.demy.platform.scheduling.domain.model.commands.CreateWeeklyScheduleCommand;
@@ -8,6 +9,7 @@ import com.smartedu.demy.platform.scheduling.domain.model.commands.UpdateWeeklyS
 import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.DayOfWeek;
 import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleCommandService;
 import com.smartedu.demy.platform.scheduling.infrastructure.persistence.jpa.repositories.WeeklyScheduleRepository;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,9 +18,11 @@ import java.util.Optional;
 public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandService {
 
     private final WeeklyScheduleRepository weeklyScheduleRepository;
+    private final ExternalIamService externalIamService;
 
-    public WeeklyScheduleCommandServiceImpl(WeeklyScheduleRepository weeklyScheduleRepository) {
+    public WeeklyScheduleCommandServiceImpl(WeeklyScheduleRepository weeklyScheduleRepository, ExternalIamService externalIamService) {
         this.weeklyScheduleRepository = weeklyScheduleRepository;
+        this.externalIamService = externalIamService;
     }
 
     @Override
@@ -59,12 +63,18 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         var weeklySchedule = weeklyScheduleOpt.get();
         var dayOfWeek = DayOfWeek.valueOf(command.dayOfWeek().toUpperCase());
 
+        // Obtener el UserId del profesor usando el servicio externo
+        UserId teacherId = externalIamService
+                .fetchTeacherIdByFullName(command.teacherFirstName(), command.teacherLastName())
+                .orElseThrow(() -> new IllegalArgumentException("No teacher with that fullname was found"));
+
         weeklySchedule.addSchedule(
                 command.startTime(),
                 command.endTime(),
                 dayOfWeek,
                 command.courseId(),
-                command.classroomId()
+                command.classroomId(),
+                teacherId.value()
         );
 
         weeklyScheduleRepository.save(weeklySchedule);
