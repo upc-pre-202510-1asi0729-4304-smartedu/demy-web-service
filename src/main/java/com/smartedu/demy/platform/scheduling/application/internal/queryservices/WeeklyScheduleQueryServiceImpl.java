@@ -4,6 +4,7 @@ package com.smartedu.demy.platform.scheduling.application.internal.queryservices
 import com.smartedu.demy.platform.scheduling.domain.model.aggregates.WeeklySchedule;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllWeeklySchedulesQuery;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetWeeklyScheduleByIdQuery;
+import com.smartedu.demy.platform.scheduling.domain.model.queries.GetWeeklyScheduleByNameQuery;
 import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleQueryService;
 import com.smartedu.demy.platform.scheduling.infrastructure.persistence.jpa.repositories.WeeklyScheduleRepository;
 import org.springframework.stereotype.Service;
@@ -29,4 +30,9 @@ public class WeeklyScheduleQueryServiceImpl implements WeeklyScheduleQueryServic
     public Optional<WeeklySchedule> handle(GetWeeklyScheduleByIdQuery query) {
         return weeklyScheduleRepository.findById(query.weeklyScheduleId());
     }
+    @Override
+    public Optional<WeeklySchedule> handle(GetWeeklyScheduleByNameQuery query) {
+        return weeklyScheduleRepository.findByName(query.name());
+    }
+
 }
