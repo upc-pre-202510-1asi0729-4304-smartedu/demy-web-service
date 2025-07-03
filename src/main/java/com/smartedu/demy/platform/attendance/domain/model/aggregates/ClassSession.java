@@ -2,7 +2,7 @@ package com.smartedu.demy.platform.attendance.domain.model.aggregates;
 
 import com.smartedu.demy.platform.shared.domain.model.aggregates.AuditableAbstractAggregateRoot;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.CourseId;
-import com.smartedu.demy.platform.attendance.domain.model.valueobjects.AttendanceRecord;
+import com.smartedu.demy.platform.attendance.domain.model.entities.AttendanceRecord;
 import com.smartedu.demy.platform.attendance.domain.model.commands.CreateClassSessionCommand;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -29,10 +29,9 @@ import lombok.Getter;
   @Getter
   private LocalDate date;
 
-  @ElementCollection
-  @CollectionTable(name="attendance_record", joinColumns = @JoinColumn(name="class_session_id"))
-  @Getter
-  private List<AttendanceRecord> attendance = new ArrayList<>();
+ @OneToMany(mappedBy = "classSession", cascade = CascadeType.ALL, orphanRemoval = true)
+ @Getter
+ private List<AttendanceRecord> attendance = new ArrayList<>();
 
   protected ClassSession(){}
 
@@ -42,6 +41,19 @@ import lombok.Getter;
  public ClassSession(CreateClassSessionCommand command){
   this.courseId = command.courseId();
   this.date = command.date();
-  this.attendance = new ArrayList<>(command.attendance());
+  command.attendance().forEach(draft -> this.addAttendance(
+          new AttendanceRecord(draft.studentId(), draft.status())
+  ));
+ }
+ /** Agregar asistencia garantizando consistencia */
+ public void addAttendance(AttendanceRecord record) {
+  record.setClassSession(this);
+  this.attendance.add(record);
+ }
+
+ /** Quitar asistencia garantizando consistencia */
+ public void removeAttendance(AttendanceRecord record) {
+  record.setClassSession(null);
+  this.attendance.remove(record);
  }
 }

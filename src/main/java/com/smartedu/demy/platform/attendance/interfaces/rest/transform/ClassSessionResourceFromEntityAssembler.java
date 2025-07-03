@@ -18,8 +18,8 @@ public class ClassSessionResourceFromEntityAssembler {
                 entity.getDate().toString(),
                 entity.getAttendance().stream()
                         .map(record -> new AttendanceRecordResource(
-                                record.studentId().value().toString(),
-                                record.status().name()
+                                record.getStudentId().value().toString(),
+                                record.getStatus().name()
                         )).toList()
         );
     }
