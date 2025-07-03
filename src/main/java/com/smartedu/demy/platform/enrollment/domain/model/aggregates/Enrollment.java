@@ -17,12 +17,13 @@ import java.util.Currency;
 public class Enrollment extends AuditableAbstractAggregateRoot<Enrollment> {
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "student_id", nullable = false))
     private StudentId studentId;
 
     @Embedded
-    @AttributeOverride(name = "value", column = @Column(name = "period_id", nullable = false))
-    private PeriodId periodId;
+    private PeriodId academicPeriodId;
+
+    @Embedded
+    private WeeklyScheduleId weeklyScheduleId;
 
     @Embedded
     @AttributeOverrides({
@@ -53,9 +54,10 @@ public class Enrollment extends AuditableAbstractAggregateRoot<Enrollment> {
      * @param enrollmentStatus The enrollment status
      * @param paymentStatus The payment status
      */
-    public Enrollment(StudentId studentId, PeriodId periodId, Money amount, EnrollmentStatus enrollmentStatus, PaymentStatus paymentStatus) {
+    public Enrollment(StudentId studentId, PeriodId periodId, WeeklyScheduleId weeklyScheduleId, Money amount, EnrollmentStatus enrollmentStatus, PaymentStatus paymentStatus) {
         this.studentId = studentId;
-        this.periodId = periodId;
+        this.academicPeriodId = periodId;
+        this.weeklyScheduleId = weeklyScheduleId;
         this.amount = amount;
         this.enrollmentStatus = enrollmentStatus;
         this.paymentStatus = paymentStatus;
@@ -64,13 +66,14 @@ public class Enrollment extends AuditableAbstractAggregateRoot<Enrollment> {
     /**
      * Constructor for creating a new Enrollment from command data
      */
-    public Enrollment(CreateEnrollmentCommand command) {
-        this.studentId = new StudentId(command.studentId());
-        this.periodId = new PeriodId(command.periodId());
-        this.amount = new Money(command.amount(), command.currency());
-        this.enrollmentStatus = EnrollmentStatus.valueOf(command.enrollmentStatus().toUpperCase());
-        this.paymentStatus = PaymentStatus.valueOf(command.paymentStatus().toUpperCase());
-    }
+//    public Enrollment(CreateEnrollmentCommand command) {
+//        this.studentId = new StudentId(command.studentId());
+//        this.academicPeriodId = new PeriodId(command.periodId());
+//        this.weeklyScheduleId = new WeeklyScheduleId(command.weeklySheduleName());
+//        this.amount = new Money(command.amount(), command.currency());
+//        this.enrollmentStatus = EnrollmentStatus.valueOf(command.enrollmentStatus().toUpperCase());
+//        this.paymentStatus = PaymentStatus.valueOf(command.paymentStatus().toUpperCase());
+//    }
 
     /**
      * Update enrollment information

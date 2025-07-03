@@ -1,0 +1,595 @@
+@startuml
+
+package demy-backend as demy_backend {
+    package enrollment {
+
+        ' Application Layer
+        package application {
+            package internal {
+                package commandservices {
+                    class AcademicPeriodCommandServiceImpl {
+                        - final AcademicPeriodRepository academicPeriodRepository
+                        + AcademicPeriodCommandServiceImpl(AcademicPeriodRepository)
+                        + Long handle(CreateAcademicPeriodCommand)
+                        + void handle(DeleteAcademicPeriodCommand)
+                        + Optional<AcademicPeriod> handle(UpdateAcademicPeriodCommand)
+                    }
+                    class EnrollmentCommandServiceImpl {
+                        - final EnrollmentRepository enrollmentRepository
+                        + EnrollmentCommandServiceImpl(EnrollmentRepository)
+                        + Long handle(CreateEnrollmentCommand)
+                        + void handle(DeleteEnrollmentCommand)
+                        + Optional<Enrollment> handle(UpdateEnrollmentCommand)
+                    }
+                    class StudentCommandServiceImpl {
+                        - final StudentRepository studentRepository
+                        + StudentCommandServiceImpl(StudentRepository)
+                        + Long handle(CreateStudentCommand)
+                        + void handle(DeleteStudentCommand)
+                        + Optional<Student> handle(UpdateStudentCommand)
+                    }
+                }
+                package queryservices {
+                    class AcademicPeriodQueryServiceImpl {
+                        - final AcademicPeriodRepository academicPeriodRepository
+                        + AcademicPeriodQueryServiceImpl(AcademicPeriodRepository)
+                        + List<AcademicPeriod> handle(GetAllAcademicPeriodsQuery)
+                        + Optional<AcademicPeriod> handle(GetAcademicPeriodByIdQuery)
+                    }
+                    class EnrollmentQueryServiceImpl {
+                        - final EnrollmentRepository enrollmentRepository
+                        - final StudentRepository studentRepository
+                        + EnrollmentQueryServiceImpl(EnrollmentRepository, StudentRepository)
+                        + List<Enrollment> handle(GetAllEnrollmentsQuery)
+                        + Optional<Enrollment> handle(GetEnrollmentByIdQuery)
+                        + List<Enrollment> handle(GetAllEnrollmentsByStudentIdQuery)
+                        + List<Enrollment> handle(GetAllEnrollmentsByStudentDniQuery)
+                    }
+                    class StudentQueryServiceImpl {
+                        - final StudentRepository studentRepository
+                        + StudentQueryServiceImpl(StudentRepository)
+                        + Optional<Student> handle(GetStudentByIdQuery)
+                        + List<Student> handle(GetAllStudentsQuery)
+                        + Optional<Student> handle(GetStudentByDniQuery)
+                    }
+                }
+            }
+        }
+
+        ' Domain Layer
+        package domain {
+            package model {
+
+                package aggregates {
+                    class AcademicPeriod <<AggregateRoot>> {
+                        - String periodName
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        - Boolean isActive
+                        # AcademicPeriod()
+                        + AcademicPeriod(CreateAcademicPeriodCommand)
+                        + AcademicPeriod updateInformation(String, LocalDate, LocalDate, Boolean)
+                    }
+                    class Enrollment <<AggregateRoot>> {
+                        - StudentId studentId
+                        - PeriodId periodId
+                        - Money amount
+                        - EnrollmentStatus enrollmentStatus
+                        - PaymentStatus paymentStatus
+                        # Enrollment()
+                        + Enrollment(CreateEnrollmentCommand)
+                        + Enrollment updateInformation(BigDecimal, Currency, String, String)
+                    }
+                    class Student <<AggregateRoot>> {
+                        - PersonName fullName
+                        - Dni dni
+                        - Sex sex
+                        - LocalDate birthDate
+                        - String address
+                        - PhoneNumber phoneNumber
+                        # Student()
+                        + Student(CreateStudentCommand)
+                        + Student updateInformation(String, String, String, String, LocalDate, String, String)
+                    }
+                }
+
+                package valueobjects {
+                    class PersonName <<ValueObject>> {
+                        - String firstName
+                        - String lastName
+                        + String getFullName()
+                    }
+                    class Dni <<ValueObject>> {
+                        - String dni
+                    }
+                    class PhoneNumber <<ValueObject>> {
+                        - String phoneNumber
+                    }
+                    class PeriodDuration <<ValueObject>> {
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        + boolean isCurrentlyActive()
+                        + long getDurationInDays()
+                    }
+                    class ActiveStatus <<ValueObject>> {
+                        - Boolean isActive
+                        + static ActiveStatus active()
+                        + static ActiveStatus inactive()
+                    }
+                    class StudentId <<ValueObject>> {
+                        - Long studentId
+                    }
+                    class PeriodId <<ValueObject>> {
+                        - Long periodId
+                    }
+                    enum Sex <<ValueObject>> {
+                        MALE
+                        FEMALE
+                    }
+                    enum EnrollmentStatus <<ValueObject>> {
+                        ACTIVE
+                        CANCELLED
+                        COMPLETED
+                        DELETED
+                    }
+                    enum PaymentStatus <<ValueObject>> {
+                        PENDING
+                        PAID
+                        REFUNDED
+                        PARTIAL
+                    }
+                }
+
+                package commands {
+                    class CreateAcademicPeriodCommand <<record>> {
+                        - String periodName
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        - Boolean isActive
+                    }
+                    class DeleteAcademicPeriodCommand <<record>> {
+                        - Long academicPeriodId
+                    }
+                    class UpdateAcademicPeriodCommand <<record>> {
+                        - Long academicPeriodId
+                        - String periodName
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        - Boolean isActive
+                    }
+                    class CreateEnrollmentCommand <<record>> {
+                        - Long studentId
+                        - Long periodId
+                        - BigDecimal amount
+                        - Currency currency
+                        - String enrollmentStatus
+                        - String paymentStatus
+                    }
+                    class DeleteEnrollmentCommand <<record>> {
+                        - Long enrollmentId
+                    }
+                    class UpdateEnrollmentCommand <<record>> {
+                        - Long enrollmentId
+                        - BigDecimal amount
+                        - Currency currency
+                        - String enrollmentStatus
+                        - String paymentStatus
+                    }
+                    class CreateStudentCommand <<record>> {
+                        - String firstName
+                        - String lastName
+                        - String dni
+                        - String sex
+                        - LocalDate birthDate
+                        - String address
+                        - String phoneNumber
+                    }
+                    class DeleteStudentCommand <<record>> {
+                        - Long studentId
+                    }
+                    class UpdateStudentCommand <<record>> {
+                        - Long studentId
+                        - String firstName
+                        - String lastName
+                        - String dni
+                        - String sex
+                        - LocalDate birthDate
+                        - String address
+                        - String phoneNumber
+                    }
+                }
+
+                package queries {
+                    class GetAllAcademicPeriodsQuery <<record>> {}
+                    class GetAcademicPeriodByIdQuery <<record>> {
+                    - Long academicPeriodId
+                    }
+                    class GetAllEnrollmentsQuery <<record>> {}
+                    class GetEnrollmentByIdQuery <<record>> {
+                    - Long enrollmentId
+                     }
+                    class GetAllEnrollmentsByStudentIdQuery <<record>> {
+                    - Long studentId
+                    }
+                    class GetAllEnrollmentsByStudentDniQuery <<record>> {
+                    - String dni
+                    }
+                    class GetAllStudentsQuery <<record>> {}
+                    class GetStudentByIdQuery <<record>> {
+                    - Long studentId
+                    }
+                    class GetStudentByDniQuery <<record>> {
+                    - String dni
+                    }
+                }
+
+                package services {
+                    interface AcademicPeriodCommandService {
+                        + Long handle(CreateAcademicPeriodCommand)
+                        + void handle(DeleteAcademicPeriodCommand)
+                        + Optional<AcademicPeriod> handle(UpdateAcademicPeriodCommand)
+                    }
+                    interface AcademicPeriodQueryService {
+                        + List<AcademicPeriod> handle(GetAllAcademicPeriodsQuery)
+                        + Optional<AcademicPeriod> handle(GetAcademicPeriodByIdQuery)
+                    }
+                    interface EnrollmentCommandService {
+                        + Long handle(CreateEnrollmentCommand)
+                        + void handle(DeleteEnrollmentCommand)
+                        + Optional<Enrollment> handle(UpdateEnrollmentCommand)
+                    }
+                    interface EnrollmentQueryService {
+                        + List<Enrollment> handle(GetAllEnrollmentsQuery)
+                        + Optional<Enrollment> handle(GetEnrollmentByIdQuery)
+                        + List<Enrollment> handle(GetAllEnrollmentsByStudentIdQuery)
+                        + List<Enrollment> handle(GetAllEnrollmentsByStudentDniQuery)
+                    }
+                    interface StudentCommandService {
+                        + Long handle(CreateStudentCommand)
+                        + void handle(DeleteStudentCommand)
+                        + Optional<Student> handle(UpdateStudentCommand)
+                    }
+                    interface StudentQueryService {
+                        + Optional<Student> handle(GetStudentByIdQuery)
+                        + List<Student> handle(GetAllStudentsQuery)
+                        + Optional<Student> handle(GetStudentByDniQuery)
+                    }
+                }
+
+            }
+        }
+
+        ' Infrastructure Layer
+        package infrastructure {
+            package persistence {
+                package jpa {
+                    package repositories {
+                        interface AcademicPeriodRepository {
+                            + boolean existsByPeriodName(String)
+                            + Optional<AcademicPeriod> findByPeriodName(String)
+                            + boolean existsByPeriodNameAndIdIsNot(String, Long)
+                        }
+                        interface EnrollmentRepository {
+                            + List<Enrollment> findAllByStudentId(StudentId)
+                            + List<Enrollment> findAllByPeriodId(PeriodId)
+                            + Optional<Enrollment> findByStudentIdAndPeriodId(StudentId, PeriodId)
+                        }
+                        interface StudentRepository {
+                            + boolean existsStudentByDni_Dni(String)
+                            + Optional<Student> findByDni_Dni(String)
+                        }
+                    }
+                }
+            }
+        }
+
+        ' Interfaces Layer (REST)
+        package interfaces {
+            package rest {
+                package controllers {
+                    class AcademicPeriodController {
+                        - final AcademicPeriodCommandService cmdSvc
+                        - final AcademicPeriodQueryService qrySvc
+                        + createAcademicPeriod(CreateAcademicPeriodResource)
+                        + getAllAcademicPeriods()
+                        + updateAcademicPeriod(Long, UpdateAcademicPeriodResource)
+                        + deleteAcademicPeriod(Long)
+                    }
+                    class EnrollmentController {
+                        - final EnrollmentCommandService cmdSvc
+                        - final EnrollmentQueryService qrySvc
+                        + createEnrollment(CreateEnrollmentResource)
+                        + getAllEnrollments()
+                        + getEnrollmentById(Long)
+                        + getEnrollmentsByStudentId(Long)
+                        + getEnrollmentsByStudentDni(String)
+                        + updateEnrollment(Long, UpdateEnrollmentResource)
+                        + deleteEnrollment(Long)
+                    }
+                    class StudentController {
+                        - final StudentCommandService cmdSvc
+                        - final StudentQueryService qrySvc
+                        + createStudent(CreateStudentResource)
+                        + getAllStudents()
+                        + getStudentById(Long)
+                        + getStudentByDni(String)
+                        + updateStudent(Long, UpdateStudentResource)
+                        + deleteStudent(Long)
+                    }
+                }
+                package resources {
+                    class AcademicPeriodResource <<record>> {
+                        - Long academicPeriodId
+                        - String periodName
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        - Boolean isActive
+                    }
+                    class CreateAcademicPeriodResource <<record>> {
+                        - String periodName
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        - Boolean isActive
+                    }
+                    class UpdateAcademicPeriodResource <<record>> {
+                        - String periodName
+                        - LocalDate startDate
+                        - LocalDate endDate
+                        - Boolean isActive
+                    }
+                    class EnrollmentResource <<record>> {
+                        - Long enrollmentId
+                        - Long studentId
+                        - Long academicPeriodId
+                        - BigDecimal amount
+                        - Currency currency
+                        - String enrollmentStatus
+                        - String paymentStatus
+                    }
+                    class CreateEnrollmentResource <<record>> {
+                        - Long studentId
+                        - Long periodId
+                        - BigDecimal amount
+                        - Currency currency
+                        - String enrollmentStatus
+                        - String paymentStatus
+                    }
+                    class UpdateEnrollmentResource <<record>> {
+                        - BigDecimal amount
+                        - Currency currency
+                        - String enrollmentStatus
+                        - String paymentStatus
+                    }
+                    class StudentResource <<record>> {
+                        - Long studentId
+                        - String firstName
+                        - String lastName
+                        - String dni
+                        - String sex
+                        - LocalDate birthDate
+                        - String address
+                        - String phoneNumber
+                    }
+                    class CreateStudentResource <<record>> {
+                        - String firstName
+                        - String lastName
+                        - String dni
+                        - String sex
+                        - LocalDate birthDate
+                        - String address
+                        - String phoneNumber
+                    }
+                    class UpdateStudentResource <<record>> {
+                        - String firstName
+                        - String lastName
+                        - String dni
+                        - String sex
+                        - LocalDate birthDate
+                        - String address
+                        - String phoneNumber
+                    }
+                }
+                package transform {
+                    class AcademicPeriodResourceFromEntityAssembler {
+                        + static toResource(AcademicPeriod)
+                    }
+                    class CreateAcademicPeriodCommandFromResourceAssembler {
+                        + static toCommand(CreateAcademicPeriodResource)
+                    }
+                    class UpdateAcademicPeriodCommandFromResourceAssembler {
+                        + static toCommand(Long, UpdateAcademicPeriodResource)
+                    }
+                    class EnrollmentResourceFromEntityAssembler {
+                        + static toResource(Enrollment)
+                    }
+                    class CreateEnrollmentCommandFromResourceAssembler {
+                        + static toCommand(CreateEnrollmentResource)
+                    }
+                    class UpdateEnrollmentCommandFromResourceAssembler {
+                        + static toCommand(Long, UpdateEnrollmentResource)
+                    }
+                    class StudentResourceFromEntityAssembler {
+                        + static toResource(Student)
+                    }
+                    class CreateStudentCommandFromResourceAssembler {
+                        + static toCommand(CreateStudentResource)
+                    }
+                    class UpdateStudentCommandFromResourceAssembler {
+                        + static toCommand(Long, UpdateStudentResource)
+                    }
+                }
+            }
+        }
+    }
+}
+
+' Shared Domain & Infrastructure
+package shared {
+    package domain {
+        package model {
+            package aggregates {
+                class AuditableAbstractAggregateRoot <<abstract>> {
+                    - Long id
+                    - Date createdAt
+                    - Date updatedAt
+                    + void addDomainEvent(Object)
+                }
+            }
+            package valueobjects {
+                class Money <<record>> {
+                    - BigDecimal amount
+                    - Currency currency
+                    + Money()
+                    + Money add(Money)
+                    + Money subtract(Money)
+                    + boolean isGreaterThanOrEqual(Money)
+                    + boolean isZero()
+                    + static Money zero(Currency)
+                }
+            }
+            package entities {
+                class AuditableModel {
+                    - Long id
+                    - Date createdAt
+                    - Date updatedAt
+                }
+            }
+        }
+        package infrastructure {
+            package persistence {
+                package jpa {
+                    package configuration {
+                        package strategy {
+                            class SnakeCaseWithPluralizedTablePhysicalNamingStrategy {
+                                + Identifier toPhysicalCatalogName(Identifier, JdbcEnvironment)
+                                + Identifier toPhysicalSchemaName(Identifier, JdbcEnvironment)
+                                + Identifier toPhysicalTableName(Identifier, JdbcEnvironment)
+                                + Identifier toPhysicalSequenceName(Identifier, JdbcEnvironment)
+                                + Identifier toPhysicalColumnName(Identifier, JdbcEnvironment)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+' Spring & Hibernate Types
+package org.springframework.data.domain {
+    class AbstractAggregateRoot {}
+}
+package org.springframework.data.jpa.repository {
+    interface JpaRepository {}
+}
+package org.hibernate.boot.model.naming {
+    interface PhysicalNamingStrategy {}
+}
+
+' Relationships: Service Impl to Service & Repository
+AcademicPeriodCommandServiceImpl ..|> AcademicPeriodCommandService
+AcademicPeriodCommandServiceImpl --> AcademicPeriodRepository
+EnrollmentCommandServiceImpl ..|> EnrollmentCommandService
+EnrollmentCommandServiceImpl --> EnrollmentRepository
+StudentCommandServiceImpl ..|> StudentCommandService
+StudentCommandServiceImpl --> StudentRepository
+
+AcademicPeriodQueryServiceImpl ..|> AcademicPeriodQueryService
+AcademicPeriodQueryServiceImpl --> AcademicPeriodRepository
+EnrollmentQueryServiceImpl ..|> EnrollmentQueryService
+EnrollmentQueryServiceImpl --> EnrollmentRepository
+EnrollmentQueryServiceImpl --> StudentRepository
+StudentQueryServiceImpl ..|> StudentQueryService
+StudentQueryServiceImpl --> StudentRepository
+
+' Command & Query Dependencies
+AcademicPeriodCommandService ..> CreateAcademicPeriodCommand
+AcademicPeriodCommandService ..> DeleteAcademicPeriodCommand
+AcademicPeriodCommandService ..> UpdateAcademicPeriodCommand
+AcademicPeriodQueryService ..> GetAllAcademicPeriodsQuery
+AcademicPeriodQueryService ..> GetAcademicPeriodByIdQuery
+
+EnrollmentCommandService ..> CreateEnrollmentCommand
+EnrollmentCommandService ..> DeleteEnrollmentCommand
+EnrollmentCommandService ..> UpdateEnrollmentCommand
+EnrollmentQueryService ..> GetAllEnrollmentsQuery
+EnrollmentQueryService ..> GetEnrollmentByIdQuery
+EnrollmentQueryService ..> GetAllEnrollmentsByStudentIdQuery
+EnrollmentQueryService ..> GetAllEnrollmentsByStudentDniQuery
+
+StudentCommandService ..> CreateStudentCommand
+StudentCommandService ..> DeleteStudentCommand
+StudentCommandService ..> UpdateStudentCommand
+StudentQueryService ..> GetAllStudentsQuery
+StudentQueryService ..> GetStudentByIdQuery
+StudentQueryService ..> GetStudentByDniQuery
+
+' Aggregates Commands
+AcademicPeriod ..> CreateAcademicPeriodCommand
+AcademicPeriod ..> UpdateAcademicPeriodCommand
+Enrollment ..> CreateEnrollmentCommand
+Enrollment ..> UpdateEnrollmentCommand
+Student ..> CreateStudentCommand
+Student ..> UpdateStudentCommand
+
+' Repository Dependencies
+AcademicPeriodRepository --|> JpaRepository
+AcademicPeriodRepository ..> AcademicPeriod
+EnrollmentRepository --|> JpaRepository
+EnrollmentRepository ..> Enrollment
+EnrollmentRepository ..> StudentId
+EnrollmentRepository ..> PeriodId
+StudentRepository --|> JpaRepository
+StudentRepository ..> Student
+
+' Value Object Usage
+Student --> PersonName
+Student --> Dni
+Student --> PhoneNumber
+Student --> Sex
+
+AcademicPeriod --> PeriodDuration
+AcademicPeriod --> ActiveStatus
+
+Enrollment --> StudentId
+Enrollment --> PeriodId
+Enrollment --> Money
+Enrollment --> EnrollmentStatus
+Enrollment --> PaymentStatus
+
+' Inheritance
+AcademicPeriod --|> AuditableAbstractAggregateRoot
+Enrollment --|> AuditableAbstractAggregateRoot
+Student --|> AuditableAbstractAggregateRoot
+AuditableAbstractAggregateRoot --|> AbstractAggregateRoot
+SnakeCaseWithPluralizedTablePhysicalNamingStrategy ..|> PhysicalNamingStrategy
+
+' Controllers & Resources & Assemblers
+AcademicPeriodController ..> AcademicPeriodCommandService
+AcademicPeriodController ..> AcademicPeriodQueryService
+AcademicPeriodController ..> CreateAcademicPeriodCommandFromResourceAssembler
+AcademicPeriodController ..> UpdateAcademicPeriodCommandFromResourceAssembler
+AcademicPeriodController ..> AcademicPeriodResourceFromEntityAssembler
+AcademicPeriodController ..> CreateAcademicPeriodResource
+AcademicPeriodController ..> UpdateAcademicPeriodResource
+AcademicPeriodController ..> AcademicPeriodResource
+
+EnrollmentController ..> EnrollmentCommandService
+EnrollmentController ..> EnrollmentQueryService
+EnrollmentController ..> CreateEnrollmentCommandFromResourceAssembler
+EnrollmentController ..> UpdateEnrollmentCommandFromResourceAssembler
+EnrollmentController ..> EnrollmentResourceFromEntityAssembler
+EnrollmentController ..> CreateEnrollmentResource
+EnrollmentController ..> UpdateEnrollmentResource
+EnrollmentController ..> EnrollmentResource
+
+StudentController ..> StudentCommandService
+StudentController ..> StudentQueryService
+StudentController ..> CreateStudentCommandFromResourceAssembler
+StudentController ..> UpdateStudentCommandFromResourceAssembler
+StudentController ..> StudentResourceFromEntityAssembler
+StudentController ..> CreateStudentResource
+StudentController ..> UpdateStudentResource
+StudentController ..> StudentResource
+
+@enduml

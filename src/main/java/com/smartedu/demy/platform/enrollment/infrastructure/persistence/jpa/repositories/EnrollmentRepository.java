@@ -20,10 +20,10 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     /**
      * Encuentra todas las matrículas por el ID del periodo.
      */
-    List<Enrollment> findAllByPeriodId(PeriodId periodId);
+    List<Enrollment> findAllByAcademicPeriodId(PeriodId periodId);
 
     /**
      * Encuentra una matrícula por ID de estudiante y periodo.
      */
-    Optional<Enrollment> findByStudentIdAndPeriodId(StudentId studentId, PeriodId periodId);
+    Optional<Enrollment> findByStudentIdAndAcademicPeriodId(StudentId studentId, PeriodId periodId);
 }
