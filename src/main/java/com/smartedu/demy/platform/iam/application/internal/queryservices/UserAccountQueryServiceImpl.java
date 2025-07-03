@@ -3,6 +3,7 @@ package com.smartedu.demy.platform.iam.application.internal.queryservices;
 import com.smartedu.demy.platform.iam.domain.model.aggregates.UserAccount;
 import com.smartedu.demy.platform.iam.domain.model.queries.GetAllAdminsQuery;
 import com.smartedu.demy.platform.iam.domain.model.queries.GetAllTeachersQuery;
+import com.smartedu.demy.platform.iam.domain.model.queries.GetTeacherByFullNameQuery;
 import com.smartedu.demy.platform.iam.domain.model.queries.GetUserAccountByIdQuery;
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.domain.services.UserAccountQueryService;
@@ -34,5 +35,10 @@ public class UserAccountQueryServiceImpl implements UserAccountQueryService {
     @Override
     public Optional<UserAccount> handle(GetUserAccountByIdQuery query) {
         return userAccountRepository.findById(query.id());
+    }
+
+    @Override
+    public Optional<UserAccount> handle(GetTeacherByFullNameQuery query) {
+        return userAccountRepository.findByFullName(query.fullname());
     }
 }
