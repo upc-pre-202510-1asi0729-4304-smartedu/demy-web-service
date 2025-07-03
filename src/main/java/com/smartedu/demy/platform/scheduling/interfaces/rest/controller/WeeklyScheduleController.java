@@ -170,4 +170,23 @@ public class WeeklyScheduleController {
         var updatedWeeklyScheduleResource = WeeklyScheduleResourceFromEntityAssembler.toResourceFromEntity(updatedWeeklyScheduleEntity);
         return ResponseEntity.ok(updatedWeeklyScheduleResource);
     }
+
+//    // Método para eliminar un horario de un horario semanal
+//    @DeleteMapping("/{weeklyScheduleId}/schedules/{scheduleId}")
+//    @Operation(summary = "Remove Schedule from Weekly Schedule", description = "Remove a schedule from a weekly schedule.")
+//    @ApiResponses(value = {
+//            @ApiResponse(responseCode = "200", description = "The schedule was removed from the weekly schedule."),
+//            @ApiResponse(responseCode = "400", description = "The schedule was not removed."),
+//            @ApiResponse(responseCode = "404", description = "The weekly schedule or schedule was not found.")
+//    })
+//    public ResponseEntity<WeeklyScheduleResource> removeScheduleFromWeeklySchedule(@PathVariable Long weeklyScheduleId, @PathVariable Long scheduleId) {
+//        var removeScheduleFromWeeklyCommand = new RemoveScheduleFromWeeklyCommand(weeklyScheduleId, scheduleId);
+//        var updatedWeeklySchedule = weeklyScheduleCommandService.handle(removeScheduleFromWeeklyCommand);
+//        if (updatedWeeklySchedule.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        var updatedWeeklyScheduleEntity = updatedWeeklySchedule.get();
+//        var updatedWeeklyScheduleResource = WeeklyScheduleResourceFromEntityAssembler.toResourceFromEntity(updatedWeeklyScheduleEntity);
+//        return ResponseEntity.ok(updatedWeeklyScheduleResource);
+//    }
 }
