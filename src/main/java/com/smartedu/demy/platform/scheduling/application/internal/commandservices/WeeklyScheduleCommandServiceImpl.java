@@ -2,10 +2,7 @@ package com.smartedu.demy.platform.scheduling.application.internal.commandservic
 
 import com.smartedu.demy.platform.scheduling.application.internal.outboundservices.acl.ExternalIamService;
 import com.smartedu.demy.platform.scheduling.domain.model.aggregates.WeeklySchedule;
-import com.smartedu.demy.platform.scheduling.domain.model.commands.AddScheduleToWeeklyCommand;
-import com.smartedu.demy.platform.scheduling.domain.model.commands.CreateWeeklyScheduleCommand;
-import com.smartedu.demy.platform.scheduling.domain.model.commands.RemoveScheduleFromWeeklyCommand;
-import com.smartedu.demy.platform.scheduling.domain.model.commands.UpdateWeeklyScheduleNameCommand;
+import com.smartedu.demy.platform.scheduling.domain.model.commands.*;
 import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.DayOfWeek;
 import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleCommandService;
 import com.smartedu.demy.platform.scheduling.infrastructure.persistence.jpa.repositories.WeeklyScheduleRepository;
@@ -93,4 +90,18 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         weeklyScheduleRepository.save(weeklySchedule);
         return Optional.of(weeklySchedule);
     }
+
+    @Override
+    public void handle(DeleteWeeklyScheduleCommand command) {
+        if (!weeklyScheduleRepository.existsById(command.weeklyScheduleId())) {
+            throw new IllegalArgumentException("WeeklySchedule with id " + command.weeklyScheduleId() + " not found");
+        }
+        try {
+            weeklyScheduleRepository.deleteById(command.weeklyScheduleId());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error deleting weekly schedule: " + e.getMessage(), e);
+        }
+
+    }
+
 }
