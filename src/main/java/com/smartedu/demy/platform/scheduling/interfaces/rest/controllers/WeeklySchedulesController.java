@@ -34,7 +34,7 @@ public class WeeklySchedulesController {
         this.weeklyScheduleQueryService = weeklyScheduleQueryService;
     }
 
-    // Método para crear un horario semanal
+
     @PostMapping
     @Operation(summary = "Create a new weekly schedule", description = "Create a new weekly schedule")
     @ApiResponses(value = {
@@ -61,7 +61,7 @@ public class WeeklySchedulesController {
         return new ResponseEntity<>(weeklyScheduleResource, HttpStatus.CREATED);
     }
 
-    // Método para obtener todos los horarios semanales
+
     @GetMapping
     @Operation(summary = "Get all weekly schedules", description = "Get all weekly schedules")
     @ApiResponses(value = {
@@ -83,7 +83,7 @@ public class WeeklySchedulesController {
         return ResponseEntity.ok(weeklyScheduleResources);
     }
 
-    // Método para obtener un horario semanal por ID
+
     @GetMapping("/{weeklyScheduleId}")
     @Operation(summary = "Get weekly schedule by ID", description = "Get a weekly schedule by ID")
     @ApiResponses(value = {
@@ -102,7 +102,7 @@ public class WeeklySchedulesController {
         return ResponseEntity.ok(weeklyScheduleResource);
     }
 
-    // Método para actualizar un horario semanal por ID
+
     @PutMapping("/{weeklyScheduleId}")
     @Operation(summary = "Update a weekly schedule by ID", description = "Update a weekly schedule by ID")
     @ApiResponses(value = {
@@ -122,7 +122,7 @@ public class WeeklySchedulesController {
         return ResponseEntity.ok(updatedWeeklyScheduleResource);
     }
 
-    // Método para eliminar un horario semanal por ID
+
     @DeleteMapping("/{weeklyScheduleId}")
     @Operation(summary = "Delete a weekly schedule by ID", description = "Delete a weekly schedule by ID")
     @ApiResponses(value = {
@@ -135,7 +135,7 @@ public class WeeklySchedulesController {
         return ResponseEntity.ok(new MessageResource("WeeklySchedule deleted successfully"));
     }
 
-    // Método para agregar un horario a un horario semanal
+
     @PostMapping("/{weeklyScheduleId}/schedules")
     @Operation(summary = "Add Schedule to Weekly Schedule", description = "Add a new schedule to an existing weekly schedule.")
     @ApiResponses(value = {
@@ -155,7 +155,7 @@ public class WeeklySchedulesController {
         return ResponseEntity.ok(updatedWeeklyScheduleResource);
     }
 
-    // Método para eliminar un horario de un horario semanal
+
     @DeleteMapping("/{weeklyScheduleId}/schedules/{scheduleId}")
     @Operation(summary = "Remove Schedule from Weekly Schedule", description = "Remove a schedule from a weekly schedule.")
     @ApiResponses(value = {
