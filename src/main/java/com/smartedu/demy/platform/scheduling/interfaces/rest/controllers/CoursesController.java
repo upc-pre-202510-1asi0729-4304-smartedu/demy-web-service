@@ -1,4 +1,4 @@
-package com.smartedu.demy.platform.scheduling.interfaces.rest.controller;
+package com.smartedu.demy.platform.scheduling.interfaces.rest.controllers;
 
 import com.smartedu.demy.platform.scheduling.domain.model.commands.DeleteCourseCommand;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllCoursesQuery;
@@ -26,12 +26,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/courses", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Courses", description = "Course Management Endpoints")
-public class CourseController {
+public class CoursesController {
 
     private final CourseCommandService courseCommandService;
     private final CourseQueryService courseQueryService;
 
-    public CourseController(CourseCommandService courseCommandService, CourseQueryService courseQueryService) {
+    public CoursesController(CourseCommandService courseCommandService, CourseQueryService courseQueryService) {
         this.courseCommandService = courseCommandService;
         this.courseQueryService = courseQueryService;
     }

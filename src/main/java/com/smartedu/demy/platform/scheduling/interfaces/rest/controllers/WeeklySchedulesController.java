@@ -1,12 +1,15 @@
-package com.smartedu.demy.platform.scheduling.interfaces.rest.controller;
+package com.smartedu.demy.platform.scheduling.interfaces.rest.controllers;
 
 import com.smartedu.demy.platform.scheduling.domain.model.commands.*;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllWeeklySchedulesQuery;
+import com.smartedu.demy.platform.scheduling.domain.model.queries.GetSchedulesByTeacherIdQuery;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetWeeklyScheduleByIdQuery;
 import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleCommandService;
 import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleQueryService;
 import com.smartedu.demy.platform.scheduling.interfaces.rest.resources.*;
 import com.smartedu.demy.platform.scheduling.interfaces.rest.transform.*;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
+import com.smartedu.demy.platform.shared.interfaces.rest.resources.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -21,12 +24,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/weekly-schedules", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "WeeklySchedules", description = "Weekly Schedule Management Endpoints")
-public class WeeklyScheduleController {
+public class WeeklySchedulesController {
 
     private final WeeklyScheduleCommandService weeklyScheduleCommandService;
     private final WeeklyScheduleQueryService weeklyScheduleQueryService;
 
-    public WeeklyScheduleController(WeeklyScheduleCommandService weeklyScheduleCommandService, WeeklyScheduleQueryService weeklyScheduleQueryService) {
+    public WeeklySchedulesController(WeeklyScheduleCommandService weeklyScheduleCommandService, WeeklyScheduleQueryService weeklyScheduleQueryService) {
         this.weeklyScheduleCommandService = weeklyScheduleCommandService;
         this.weeklyScheduleQueryService = weeklyScheduleQueryService;
     }
@@ -119,18 +122,18 @@ public class WeeklyScheduleController {
         return ResponseEntity.ok(updatedWeeklyScheduleResource);
     }
 
-//    // Método para eliminar un horario semanal por ID
-//    @DeleteMapping("/{weeklyScheduleId}")
-//    @Operation(summary = "Delete a weekly schedule by ID", description = "Delete a weekly schedule by ID")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "204", description = "Weekly schedule deleted successfully"),
-//            @ApiResponse(responseCode = "404", description = "Weekly schedule not found")
-//    })
-//    public ResponseEntity<?> deleteWeeklySchedule(@PathVariable Long weeklyScheduleId) {
-//        var deleteWeeklyScheduleCommand = new DeleteWeeklyScheduleCommand(weeklyScheduleId);
-//        weeklyScheduleCommandService.handle(deleteWeeklyScheduleCommand);
-//        return ResponseEntity.ok("Weekly schedule deleted successfully");
-//    }
+    // Método para eliminar un horario semanal por ID
+    @DeleteMapping("/{weeklyScheduleId}")
+    @Operation(summary = "Delete a weekly schedule by ID", description = "Delete a weekly schedule by ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Weekly schedule deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "Weekly schedule not found")
+    })
+    public ResponseEntity<?> deleteWeeklySchedule(@PathVariable Long weeklyScheduleId) {
+        var deleteWeeklyScheduleCommand = new DeleteWeeklyScheduleCommand(weeklyScheduleId);
+        weeklyScheduleCommandService.handle(deleteWeeklyScheduleCommand);
+        return ResponseEntity.ok(new MessageResource("WeeklySchedule deleted successfully"));
+    }
 
     // Método para agregar un horario a un horario semanal
     @PostMapping("/{weeklyScheduleId}/schedules")
@@ -171,22 +174,26 @@ public class WeeklyScheduleController {
         return ResponseEntity.ok(updatedWeeklyScheduleResource);
     }
 
-//    // Método para eliminar un horario de un horario semanal
-//    @DeleteMapping("/{weeklyScheduleId}/schedules/{scheduleId}")
-//    @Operation(summary = "Remove Schedule from Weekly Schedule", description = "Remove a schedule from a weekly schedule.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "The schedule was removed from the weekly schedule."),
-//            @ApiResponse(responseCode = "400", description = "The schedule was not removed."),
-//            @ApiResponse(responseCode = "404", description = "The weekly schedule or schedule was not found.")
-//    })
-//    public ResponseEntity<WeeklyScheduleResource> removeScheduleFromWeeklySchedule(@PathVariable Long weeklyScheduleId, @PathVariable Long scheduleId) {
-//        var removeScheduleFromWeeklyCommand = new RemoveScheduleFromWeeklyCommand(weeklyScheduleId, scheduleId);
-//        var updatedWeeklySchedule = weeklyScheduleCommandService.handle(removeScheduleFromWeeklyCommand);
-//        if (updatedWeeklySchedule.isEmpty()) {
-//            return ResponseEntity.notFound().build();
-//        }
-//        var updatedWeeklyScheduleEntity = updatedWeeklySchedule.get();
-//        var updatedWeeklyScheduleResource = WeeklyScheduleResourceFromEntityAssembler.toResourceFromEntity(updatedWeeklyScheduleEntity);
-//        return ResponseEntity.ok(updatedWeeklyScheduleResource);
-//    }
+    // Endpoint para obtener los horarios semanales por teacherId
+    @GetMapping("/by-teacher/{teacherId}")
+    @Operation(summary = "Get weekly schedules by teacherId", description = "Get all weekly schedules for a given teacherId")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Weekly schedules found"),
+            @ApiResponse(responseCode = "404", description = "No weekly schedules found for teacherId")
+    })
+    public ResponseEntity<List<ScheduleResource>> getSchedulesByTeacherId(@PathVariable Long teacherId) {
+        var getSchedulesByTeacherIdQuery = new GetSchedulesByTeacherIdQuery(new UserId(teacherId));
+        var schedules = weeklyScheduleQueryService.handle(getSchedulesByTeacherIdQuery);
+
+        if (schedules == null || schedules.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        var scheduleResources = schedules.stream()
+                .map(ScheduleResourceFromEntityAssembler::toResourceFromEntity)
+                .toList();
+
+        return ResponseEntity.ok(scheduleResources);
+    }
+
 }

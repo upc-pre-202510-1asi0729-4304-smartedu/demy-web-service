@@ -1,5 +1,5 @@
 
-package com.smartedu.demy.platform.scheduling.interfaces.rest.controller;
+package com.smartedu.demy.platform.scheduling.interfaces.rest.controllers;
 
 import com.smartedu.demy.platform.scheduling.domain.model.commands.DeleteClassroomCommand;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllClassroomsQuery;
@@ -28,12 +28,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/classrooms", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Classrooms", description = "Classroom Management Endpoints")
-public class ClassroomController {
+public class ClassroomsController {
 
     private final ClassroomCommandService classroomCommandService;
     private final ClassroomQueryService classroomQueryService;
 
-    public ClassroomController(ClassroomCommandService classroomCommandService, ClassroomQueryService classroomQueryService) {
+    public ClassroomsController(ClassroomCommandService classroomCommandService, ClassroomQueryService classroomQueryService) {
         this.classroomCommandService = classroomCommandService;
         this.classroomQueryService = classroomQueryService;
     }
