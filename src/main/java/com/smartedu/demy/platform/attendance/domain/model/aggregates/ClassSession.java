@@ -42,7 +42,7 @@ import lombok.Getter;
   this.courseId = command.courseId();
   this.date = command.date();
   command.attendance().forEach(draft -> this.addAttendance(
-          new AttendanceRecord(draft.studentId(), draft.status())
+          new AttendanceRecord(draft.dni(), draft.status())
   ));
  }
  /** Agregar asistencia garantizando consistencia */
