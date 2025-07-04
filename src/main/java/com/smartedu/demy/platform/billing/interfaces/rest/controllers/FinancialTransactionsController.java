@@ -1,6 +1,8 @@
 package com.smartedu.demy.platform.billing.interfaces.rest.controllers;
 
+import com.smartedu.demy.platform.billing.domain.model.queries.GetAllFinancialTransactionsQuery;
 import com.smartedu.demy.platform.billing.domain.services.FinancialTransactionCommandService;
+import com.smartedu.demy.platform.billing.domain.services.FinancialTransactionQueryService;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.CreateFinancialTransactionResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.FinancialTransactionResource;
 import com.smartedu.demy.platform.billing.interfaces.rest.resources.RegisterExpenseResource;
@@ -14,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -21,9 +25,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Tag(name = "Financial Transactions", description = "Endpoints for financial transactions")
 public class FinancialTransactionsController {
     private final FinancialTransactionCommandService financialTransactionCommandService;
+    private final FinancialTransactionQueryService financialTransactionQueryService;
 
-    public FinancialTransactionsController(FinancialTransactionCommandService financialTransactionCommandService) {
+    public FinancialTransactionsController(FinancialTransactionCommandService financialTransactionCommandService,
+                                           FinancialTransactionQueryService financialTransactionQueryService) {
         this.financialTransactionCommandService = financialTransactionCommandService;
+        this.financialTransactionQueryService = financialTransactionQueryService;
+    }
+
+    @GetMapping
+    public ResponseEntity<List<FinancialTransactionResource>> getAllFinancialTransactions() {
+        var getAllFinancialTransactionsQuery = new GetAllFinancialTransactionsQuery();
+        var financialTransactions = financialTransactionQueryService.handle(getAllFinancialTransactionsQuery);
+        var financialTransactionResources = financialTransactions.stream().map(
+                FinancialTransactionResourceFromEntityAssembler::toResourceFromEntity).toList();
+        return ResponseEntity.ok(financialTransactionResources);
     }
 
     @PostMapping
