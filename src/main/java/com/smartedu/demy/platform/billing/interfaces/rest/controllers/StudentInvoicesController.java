@@ -19,18 +19,18 @@ import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = "/api/v1/invoices", produces = APPLICATION_JSON_VALUE)
-@Tag(name = "Invoices", description = "Endpoints for invoices")
-public class InvoicesController {
+@RequestMapping(value = "/api/v1/students/{dni}/invoices", produces = APPLICATION_JSON_VALUE)
+@Tag(name = "Student Invoices", description = "Endpoints for managing invoices assigned to students")
+public class StudentInvoicesController {
     private final InvoiceQueryService invoiceQueryService;
     private final InvoiceCommandService invoiceCommandService;
 
-    public InvoicesController(InvoiceQueryService invoiceQueryService, InvoiceCommandService invoiceCommandService) {
+    public StudentInvoicesController(InvoiceQueryService invoiceQueryService, InvoiceCommandService invoiceCommandService) {
         this.invoiceQueryService = invoiceQueryService;
         this.invoiceCommandService = invoiceCommandService;
     }
 
-    @GetMapping("/by-student/{dni}")
+    @GetMapping
     public ResponseEntity<List<InvoiceResource>> getAllInvoicesByDni(@PathVariable String dni) {
         var getAllInvoicesByDniQuery = new GetAllInvoicesByDniQuery(new Dni(dni));
         var invoiceResources = invoiceQueryService.handle(getAllInvoicesByDniQuery).stream()
@@ -40,8 +40,8 @@ public class InvoicesController {
     }
 
     @PostMapping
-    public ResponseEntity<InvoiceResource> createInvoice(@RequestBody CreateInvoiceResource resource) {
-        var createInvoiceCommand = CreateInvoiceCommandFromResourceAssembler.toCommandFromResource(resource);
+    public ResponseEntity<InvoiceResource> createInvoice(@PathVariable String dni, @RequestBody CreateInvoiceResource resource) {
+        var createInvoiceCommand = CreateInvoiceCommandFromResourceAssembler.toCommandFromResource(dni, resource);
         var invoiceId = invoiceCommandService.handle(createInvoiceCommand);
         var getInvoiceByIdQuery = new GetInvoiceByIdQuery(invoiceId);
         var invoice = invoiceQueryService.handle(getInvoiceByIdQuery);
