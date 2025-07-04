@@ -15,6 +15,10 @@ import com.smartedu.demy.platform.iam.infrastructure.persistence.jpa.repositorie
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of the {@link UserAccountCommandService} responsible for handling
+ * commands related to user account creation, authentication, updates, deletions, and password resets.
+ */
 @Service
 public class UserAccountCommandServiceImpl implements UserAccountCommandService {
 
@@ -23,6 +27,14 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
     private final TokenService tokenService;
     private final AcademyRepository academyRepository;
 
+    /**
+     * Constructs the command service with required dependencies.
+     *
+     * @param userAccountRepository the repository for managing user accounts.
+     * @param hashingService the service for password hashing and validation.
+     * @param tokenService the service for generating JWT tokens.
+     * @param academyRepository the repository for managing academy entities.
+     */
     public UserAccountCommandServiceImpl(
             UserAccountRepository userAccountRepository,
             HashingService hashingService,
@@ -35,6 +47,13 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         this.academyRepository = academyRepository;
     }
 
+    /**
+     * Handles the sign-up of a new admin user and creates an associated academy.
+     *
+     * @param command the command containing admin sign-up details.
+     * @return the newly created admin user account.
+     * @throws RuntimeException if the email is already registered or the input is invalid.
+     */
     @Override
     public UserAccount handle(SignUpAdminCommand command) {
         userAccountRepository.findByEmail(new Email(command.email()))
@@ -63,6 +82,13 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         return savedAdmin;
     }
 
+    /**
+     * Handles user sign-in by validating credentials and generating a JWT token.
+     *
+     * @param command the command containing email and password for login.
+     * @return a pair containing the authenticated user and the generated JWT token.
+     * @throws RuntimeException if the user is not found or the password is invalid.
+     */
     @Override
     public ImmutablePair<UserAccount, String> handle(SignInUserAccountCommand command) {
         var optionalUser = userAccountRepository.findByEmail(new Email(command.email()));
@@ -81,6 +107,13 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         return ImmutablePair.of(user, jwtToken);
     }
 
+    /**
+     * Handles the creation of a new teacher user account.
+     *
+     * @param command the command containing teacher details.
+     * @return the newly created teacher user account.
+     * @throws RuntimeException if the email is already registered or the input is invalid.
+     */
     @Override
     public UserAccount handle(CreateTeacherCommand command) {
 
@@ -101,6 +134,13 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         return userAccountRepository.save(teacher);
     }
 
+    /**
+     * Handles updating an existing user account's profile and role.
+     *
+     * @param command the command containing updated user information.
+     * @return the updated user account.
+     * @throws RuntimeException if the user is not found.
+     */
     @Override
     public UserAccount handle(UpdateUserAccountCommand command) {
         var user = userAccountRepository.findById(command.id())
@@ -112,11 +152,22 @@ public class UserAccountCommandServiceImpl implements UserAccountCommandService 
         return userAccountRepository.save(user);
     }
 
+    /**
+     * Handles deletion of a user account by ID.
+     *
+     * @param command the command specifying the user account to delete.
+     */
     @Override
     public void handle(DeleteUserAccountCommand command) {
         userAccountRepository.deleteById(command.id());
     }
 
+    /**
+     * Handles resetting the password for a user account.
+     *
+     * @param command the command containing email and new password.
+     * @throws RuntimeException if the user is not found.
+     */
     @Override
     public void handle(ResetPasswordCommand command) {
         UserAccount user = userAccountRepository.findByEmail(new Email(command.email()))
