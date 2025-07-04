@@ -196,4 +196,22 @@ public class WeeklySchedulesController {
         return ResponseEntity.ok(scheduleResources);
     }
 
+    @PutMapping("/schedules/{scheduleId}")
+    @Operation(summary = "Update a Schedule by ID", description = "Updates the classroom, start time, end time and day fields of a Schedule by its ID")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Schedule updated successfully"),
+            @ApiResponse(responseCode = "404", description = "Schedule not found")
+    })
+    public ResponseEntity<?> updateSchedule(
+            @PathVariable Long scheduleId,
+            @RequestBody UpdateScheduleResource resource) {
+        var command = UpdateScheduleCommandFromResourceAssembler.toCommandFromResource(scheduleId, resource);
+        var updatedScheduleOpt = weeklyScheduleCommandService.handle(command);
+        if (updatedScheduleOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var updatedSchedule = updatedScheduleOpt.get();
+        var scheduleResource = ScheduleResourceFromEntityAssembler.toResourceFromEntity(updatedSchedule);
+        return ResponseEntity.ok(scheduleResource);
+    }
 }

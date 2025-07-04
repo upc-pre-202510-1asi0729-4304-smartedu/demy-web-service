@@ -2,6 +2,7 @@ package com.smartedu.demy.platform.scheduling.domain.services;
 
 import com.smartedu.demy.platform.scheduling.domain.model.aggregates.WeeklySchedule;
 import com.smartedu.demy.platform.scheduling.domain.model.commands.*;
+import com.smartedu.demy.platform.scheduling.domain.model.entities.Schedule;
 
 import java.util.Optional;
 
@@ -16,4 +17,7 @@ public interface WeeklyScheduleCommandService {
     Optional<WeeklySchedule> handle(RemoveScheduleFromWeeklyCommand command);
 
     void handle(DeleteWeeklyScheduleCommand command);
+
+    Optional<Schedule> handle(UpdateScheduleCommand command);
+
 }

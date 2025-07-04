@@ -3,8 +3,10 @@ package com.smartedu.demy.platform.scheduling.application.internal.commandservic
 import com.smartedu.demy.platform.scheduling.application.internal.outboundservices.acl.ExternalIamService;
 import com.smartedu.demy.platform.scheduling.domain.model.aggregates.WeeklySchedule;
 import com.smartedu.demy.platform.scheduling.domain.model.commands.*;
+import com.smartedu.demy.platform.scheduling.domain.model.entities.Schedule;
 import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.DayOfWeek;
 import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleCommandService;
+import com.smartedu.demy.platform.scheduling.infrastructure.persistence.jpa.repositories.ScheduleRepository;
 import com.smartedu.demy.platform.scheduling.infrastructure.persistence.jpa.repositories.WeeklyScheduleRepository;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.UserId;
 import org.springframework.stereotype.Service;
@@ -16,10 +18,12 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
 
     private final WeeklyScheduleRepository weeklyScheduleRepository;
     private final ExternalIamService externalIamService;
+    private final ScheduleRepository scheduleRepository;
 
-    public WeeklyScheduleCommandServiceImpl(WeeklyScheduleRepository weeklyScheduleRepository, ExternalIamService externalIamService) {
+    public WeeklyScheduleCommandServiceImpl(WeeklyScheduleRepository weeklyScheduleRepository, ExternalIamService externalIamService, ScheduleRepository scheduleRepository) {
         this.weeklyScheduleRepository = weeklyScheduleRepository;
         this.externalIamService = externalIamService;
+        this.scheduleRepository = scheduleRepository;
     }
 
     @Override
@@ -104,4 +108,20 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
 
     }
 
+    @Override
+    public Optional<Schedule> handle(UpdateScheduleCommand command) {
+        var scheduleOpt = scheduleRepository.findById(command.scheduleId());
+        if (scheduleOpt.isEmpty()) {
+            throw new IllegalArgumentException("Schedule with id " + command.scheduleId() + " not found");
+        }
+        var schedule = scheduleOpt.get();
+        schedule.updateSchedule(
+            command.classroomId(),
+            command.startTime(),
+            command.endTime(),
+            DayOfWeek.valueOf(command.dayOfWeek().toUpperCase())
+        );
+        scheduleRepository.save(schedule);
+        return Optional.of(schedule);
+    }
 }
