@@ -1,13 +1,13 @@
 package com.smartedu.demy.platform.attendance.domain.model.valueobjects;
 
-import com.smartedu.demy.platform.shared.domain.model.valueobjects.StudentId;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.Dni;
 
 public record AttendanceDraft(
-        StudentId studentId,
+        Dni dni,
         AttendanceStatus status
 ) {
     public AttendanceDraft {
-        if (studentId == null) {
+        if (dni == null) {
             throw new IllegalArgumentException("StudentId is required");
         }
         if (status == null) {
