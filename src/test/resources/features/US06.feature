@@ -5,8 +5,9 @@ Feature: Registrar matrícula de un estudiante
 
   Scenario Outline: Registro de matrícula
     Given existe un Student con id <studentId>
-    And existe un AcademicPeriod con id <periodId>
-    When intento registrar la matrícula con amount <amount> y currency "<currency>"
+    And existe un AcademicPeriod con id <academicPeriodId>
+    And existe un WeeklySchedule con id <weeklyScheduleId>
+    When intento registrar la matrícula con amount <amount> y currency <currency>
     Then debe crearse una Enrollment con
       | studentId         | <studentId>         |
       | academicPeriodId  | <academicPeriodId>  |
@@ -18,7 +19,7 @@ Feature: Registrar matrícula de un estudiante
     And el mensaje final es "<message>"
 
     Examples:
-      |studentId|academicPeriodId |weeklyScheduleId| amount  | currency | message         |
-      | 1       | 1               |1               | 1500.00 | PEN      | Test Passed     |
-      | 2       | 2               |2               | -500.00 | PEN      | Error           |
-      |         |                 |                | 1500.00 | PEN      | Error           |
+      |studentId|academicPeriodId |weeklyScheduleId| amount  | currency | message     |
+      | 5       | 7               |1               | 1500.00 | PEN      | Test Passed |
+      | 6       | 8               |2               | -500.00 | PEN      | Error       |
+      | 7       | 9               | 1              | 1500.00 | PEN      | Test Passed |
