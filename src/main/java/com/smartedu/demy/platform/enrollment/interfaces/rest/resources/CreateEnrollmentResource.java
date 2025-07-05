@@ -3,12 +3,12 @@ package com.smartedu.demy.platform.enrollment.interfaces.rest.resources;
 import java.math.BigDecimal;
 import java.util.Currency;
 
-public record CreateEnrollmentResource(Long studentId, Long periodId, String weeklyScheduleName, BigDecimal amount, Currency currency, String enrollmentStatus, String paymentStatus) {
+public record CreateEnrollmentResource(Long studentId, Long academicPeriodId, String weeklyScheduleName, BigDecimal amount, Currency currency, String enrollmentStatus, String paymentStatus) {
     public CreateEnrollmentResource {
         if (studentId == null || studentId < 1) {
             throw new IllegalArgumentException("studentId cannot be null");
         }
-        if (periodId == null || periodId < 1) {
+        if (academicPeriodId == null || academicPeriodId < 1) {
             throw new IllegalArgumentException("periodId cannot be null");
         }
         if ( amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
