@@ -11,6 +11,7 @@ import com.smartedu.demy.platform.scheduling.interfaces.rest.resources.UpdateCou
 import com.smartedu.demy.platform.scheduling.interfaces.rest.transform.CourseResourceFromEntityAssembler;
 import com.smartedu.demy.platform.scheduling.interfaces.rest.transform.CreateCourseCommandFromResourceAssembler;
 import com.smartedu.demy.platform.scheduling.interfaces.rest.transform.UpdateCourseCommandFromResourceAssembler;
+import com.smartedu.demy.platform.shared.interfaces.rest.resources.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -127,12 +128,12 @@ public class CourseController {
     @DeleteMapping("/{courseId}")
     @Operation(summary = "Delete a course by ID", description = "Delete a course by ID")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "204", description = "Course deleted successfully"),
+            @ApiResponse(responseCode = "200", description = "Course deleted successfully"),
             @ApiResponse(responseCode = "404", description = "Course not found")
     })
     public ResponseEntity<?> deleteCourse(@PathVariable Long courseId) {
         var deleteCourseCommand = new DeleteCourseCommand(courseId);
         courseCommandService.handle(deleteCourseCommand);
-        return ResponseEntity.ok("Course deleted successfully");
+        return ResponseEntity.ok(new MessageResource("Course deleted successfully"));
     }
 }

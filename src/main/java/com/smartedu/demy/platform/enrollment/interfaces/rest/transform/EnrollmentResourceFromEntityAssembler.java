@@ -9,9 +9,11 @@ public class EnrollmentResourceFromEntityAssembler {
         return new EnrollmentResource(
                 entity.getId(),
                 entity.getStudentId().studentId(),
-                entity.getPeriodId().periodId(),
+                entity.getAcademicPeriodId().periodId(),
+                entity.getWeeklyScheduleId().weeklyScheduleId(),
                 entity.getAmount().amount(),
                 entity.getAmount().currency(),
+                entity.getCreatedAt(),
                 entity.getEnrollmentStatus().toString(),
                 entity.getPaymentStatus().toString()
         );

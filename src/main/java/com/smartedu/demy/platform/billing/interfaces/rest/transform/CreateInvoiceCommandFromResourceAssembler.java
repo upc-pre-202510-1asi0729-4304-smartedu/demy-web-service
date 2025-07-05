@@ -5,6 +5,11 @@ import com.smartedu.demy.platform.billing.interfaces.rest.resources.CreateInvoic
 
 public class CreateInvoiceCommandFromResourceAssembler {
     public static CreateInvoiceCommand toCommandFromResource(CreateInvoiceResource resource) {
-        return new CreateInvoiceCommand(resource.studentId(), resource.amount(), resource.currency(), resource.dueDate());
+        return new CreateInvoiceCommand(
+                resource.dni(),
+                resource.amount(),
+                resource.currency(),
+                resource.dueDate()
+        );
     }
 }
