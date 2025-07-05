@@ -12,6 +12,7 @@ import com.smartedu.demy.platform.enrollment.interfaces.rest.resources.UpdateStu
 import com.smartedu.demy.platform.enrollment.interfaces.rest.transform.CreateStudentCommandFromResourceAssembler;
 import com.smartedu.demy.platform.enrollment.interfaces.rest.transform.StudentResourceFromEntityAssembler;
 import com.smartedu.demy.platform.enrollment.interfaces.rest.transform.UpdateStudentCommandFromResourceAssembler;
+import com.smartedu.demy.platform.shared.interfaces.rest.resources.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -27,12 +28,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/students", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Students", description = "Available Student Endpoints")
-public class StudentController {
+public class StudentsController {
 
     private final StudentCommandService studentCommandService;
     private final StudentQueryService studentQueryService;
 
-    public StudentController(StudentCommandService studentCommandService, StudentQueryService studentQueryService) {
+    public StudentsController(StudentCommandService studentCommandService, StudentQueryService studentQueryService) {
         this.studentCommandService = studentCommandService;
         this.studentQueryService = studentQueryService;
     }
@@ -126,6 +127,6 @@ public class StudentController {
     public ResponseEntity<?> deleteStudent(@PathVariable Long studentId) {
         var deleteCommand = new DeleteStudentCommand(studentId);
         studentCommandService.handle(deleteCommand);
-        return ResponseEntity.ok("Student successfully deleted");
+        return ResponseEntity.ok(new MessageResource("Student successfully deleted"));
     }
 }

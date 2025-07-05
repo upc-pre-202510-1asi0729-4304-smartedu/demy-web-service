@@ -11,6 +11,7 @@ import com.smartedu.demy.platform.enrollment.interfaces.rest.resources.UpdateAca
 import com.smartedu.demy.platform.enrollment.interfaces.rest.transform.AcademicPeriodResourceFromEntityAssembler;
 import com.smartedu.demy.platform.enrollment.interfaces.rest.transform.CreateAcademicPeriodCommandFromResourceAssembler;
 import com.smartedu.demy.platform.enrollment.interfaces.rest.transform.UpdateAcademicPeriodCommandFromResourceAssembler;
+import com.smartedu.demy.platform.shared.interfaces.rest.resources.MessageResource;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -26,11 +27,11 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/academic-periods", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "AcademicPeriods", description = "Available Academic Periods Endpoints")
-public class    AcademicPeriodController {
+public class AcademicPeriodsController {
     private final AcademicPeriodCommandService academicPeriodCommandService;
     private final AcademicPeriodQueryService academicPeriodQueryService;
 
-    public AcademicPeriodController(AcademicPeriodCommandService academicPeriodCommandService, AcademicPeriodQueryService academicPeriodQueryService) {
+    public AcademicPeriodsController(AcademicPeriodCommandService academicPeriodCommandService, AcademicPeriodQueryService academicPeriodQueryService) {
         this.academicPeriodCommandService = academicPeriodCommandService;
         this.academicPeriodQueryService = academicPeriodQueryService;
     }
@@ -89,6 +90,6 @@ public ResponseEntity<AcademicPeriodResource> createAcademicPeriod(@RequestBody 
     public ResponseEntity<?> deleteAcademicPeriod(@PathVariable Long academicPeriodId) {
         var deleteAcademicPeriodCommand = new DeleteAcademicPeriodCommand(academicPeriodId);
         academicPeriodCommandService.handle(deleteAcademicPeriodCommand);
-        return ResponseEntity.ok("Academic period with given id successfully deleted");
+        return ResponseEntity.ok(new MessageResource("Academic period deleted successfully"));
     }
 }

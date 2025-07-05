@@ -2,7 +2,6 @@ package com.smartedu.demy.platform.enrollment.interfaces.rest.controllers;
 
 import com.smartedu.demy.platform.enrollment.domain.model.commands.CreateEnrollmentCommand;
 import com.smartedu.demy.platform.enrollment.domain.model.commands.DeleteEnrollmentCommand;
-import com.smartedu.demy.platform.enrollment.domain.model.commands.UpdateEnrollmentCommand;
 import com.smartedu.demy.platform.enrollment.domain.model.queries.*;
 import com.smartedu.demy.platform.enrollment.domain.services.EnrollmentCommandService;
 import com.smartedu.demy.platform.enrollment.domain.services.EnrollmentQueryService;
@@ -27,12 +26,12 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RestController
 @RequestMapping(value = "/api/v1/enrollments", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Enrollments", description = "Available Enrollment Endpoints")
-public class EnrollmentController {
+public class EnrollmentsController {
 
     private final EnrollmentCommandService enrollmentCommandService;
     private final EnrollmentQueryService enrollmentQueryService;
 
-    public EnrollmentController(EnrollmentCommandService enrollmentCommandService, EnrollmentQueryService enrollmentQueryService) {
+    public EnrollmentsController(EnrollmentCommandService enrollmentCommandService, EnrollmentQueryService enrollmentQueryService) {
         this.enrollmentCommandService = enrollmentCommandService;
         this.enrollmentQueryService = enrollmentQueryService;
     }
