@@ -13,6 +13,7 @@ public class EnrollmentResourceFromEntityAssembler {
                 entity.getWeeklyScheduleId().weeklyScheduleId(),
                 entity.getAmount().amount(),
                 entity.getAmount().currency(),
+                entity.getCreatedAt(),
                 entity.getEnrollmentStatus().toString(),
                 entity.getPaymentStatus().toString()
         );
