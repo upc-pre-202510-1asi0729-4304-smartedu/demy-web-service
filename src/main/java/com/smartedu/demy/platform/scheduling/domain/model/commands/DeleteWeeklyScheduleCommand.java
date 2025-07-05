@@ -1,5 +1,9 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to delete a weekly schedule.
+ * @param weeklyScheduleId ID of the weekly schedule to delete
+ */
 public record DeleteWeeklyScheduleCommand (Long weeklyScheduleId){
     public DeleteWeeklyScheduleCommand {
         if (weeklyScheduleId == null || weeklyScheduleId <= 0) {

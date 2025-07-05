@@ -1,5 +1,14 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to update the details of an existing schedule.
+ *
+ * @param scheduleId The unique identifier of the schedule to be updated.
+ * @param classroomId The unique identifier of the classroom for the schedule.
+ * @param startTime The start time of the schedule.
+ * @param endTime The end time of the schedule.
+ * @param dayOfWeek The day of the week when the schedule occurs.
+ */
 public record UpdateScheduleCommand (
         Long scheduleId,
         Long classroomId,

@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Weekly Schedule Command Service Implementation
+ * <p>This class implements the weekly schedule command service interface and provides the business logic for handling weekly schedule commands such as create, update, delete, and schedule management operations.</p>
+ */
 @Service
 public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandService {
 
@@ -20,12 +24,26 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
     private final ExternalIamService externalIamService;
     private final ScheduleRepository scheduleRepository;
 
+    /**
+     * Constructor that initializes the service with the required repositories and external services.
+     * @param weeklyScheduleRepository The weekly schedule repository.
+     * @param externalIamService The external IAM service for teacher validation.
+     * @param scheduleRepository The schedule repository.
+     */
     public WeeklyScheduleCommandServiceImpl(WeeklyScheduleRepository weeklyScheduleRepository, ExternalIamService externalIamService, ScheduleRepository scheduleRepository) {
         this.weeklyScheduleRepository = weeklyScheduleRepository;
         this.externalIamService = externalIamService;
         this.scheduleRepository = scheduleRepository;
     }
 
+    /**
+     * This method is used to handle the creation of a new weekly schedule.
+     * @param command The create weekly schedule command containing the weekly schedule data.
+     * @return The ID of the created weekly schedule.
+     * @throws IllegalArgumentException if a weekly schedule with the same name already exists.
+     * @see CreateWeeklyScheduleCommand
+     * @see WeeklySchedule
+     */
     @Override
     public Long handle(CreateWeeklyScheduleCommand command) {
         if (weeklyScheduleRepository.existsByName(command.name())) {
@@ -37,6 +55,14 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         return weeklySchedule.getId();
     }
 
+    /**
+     * This method is used to handle the update of a weekly schedule name.
+     * @param command The update weekly schedule name command containing the new name data.
+     * @return An optional with the updated weekly schedule if successful.
+     * @throws IllegalArgumentException if the weekly schedule is not found or if a weekly schedule with the same name already exists.
+     * @see UpdateWeeklyScheduleNameCommand
+     * @see WeeklySchedule
+     */
     @Override
     public Optional<WeeklySchedule> handle(UpdateWeeklyScheduleNameCommand command) {
         var weeklyScheduleOpt = weeklyScheduleRepository.findById(command.weeklyScheduleId());
@@ -54,6 +80,15 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         return Optional.of(weeklySchedule);
     }
 
+    /**
+     * This method is used to handle adding a schedule to a weekly schedule.
+     * @param command The add schedule to weekly command containing the schedule data.
+     * @return An optional with the updated weekly schedule if successful.
+     * @throws IllegalArgumentException if the weekly schedule is not found or if the teacher is not found.
+     * @see AddScheduleToWeeklyCommand
+     * @see WeeklySchedule
+     * @see DayOfWeek
+     */
     @Override
     public Optional<WeeklySchedule> handle(AddScheduleToWeeklyCommand command) {
         var weeklyScheduleOpt = weeklyScheduleRepository.findById(command.weeklyScheduleId());
@@ -64,7 +99,6 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         var weeklySchedule = weeklyScheduleOpt.get();
         var dayOfWeek = DayOfWeek.valueOf(command.dayOfWeek().toUpperCase());
 
-        // Obtener el UserId del profesor usando el servicio externo
         UserId teacherId = externalIamService
                 .fetchTeacherIdByFullName(command.teacherFirstName(), command.teacherLastName())
                 .orElseThrow(() -> new IllegalArgumentException("No teacher with that fullname was found"));
@@ -82,6 +116,14 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         return Optional.of(weeklySchedule);
     }
 
+    /**
+     * This method is used to handle removing a schedule from a weekly schedule.
+     * @param command The remove schedule from weekly command containing the schedule ID to remove.
+     * @return An optional with the updated weekly schedule if successful.
+     * @throws IllegalArgumentException if the weekly schedule is not found.
+     * @see RemoveScheduleFromWeeklyCommand
+     * @see WeeklySchedule
+     */
     @Override
     public Optional<WeeklySchedule> handle(RemoveScheduleFromWeeklyCommand command) {
         var weeklyScheduleOpt = weeklyScheduleRepository.findById(command.weeklyScheduleId());
@@ -95,6 +137,12 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
         return Optional.of(weeklySchedule);
     }
 
+    /**
+     * This method is used to handle the deletion of an existing weekly schedule.
+     * @param command The delete weekly schedule command containing the weekly schedule ID to delete.
+     * @throws IllegalArgumentException if the weekly schedule to delete is not found or if there's an error deleting the weekly schedule.
+     * @see DeleteWeeklyScheduleCommand
+     */
     @Override
     public void handle(DeleteWeeklyScheduleCommand command) {
         if (!weeklyScheduleRepository.existsById(command.weeklyScheduleId())) {
@@ -108,6 +156,15 @@ public class WeeklyScheduleCommandServiceImpl implements WeeklyScheduleCommandSe
 
     }
 
+    /**
+     * This method is used to handle the update of an existing schedule.
+     * @param command The update schedule command containing the updated schedule data.
+     * @return An optional with the updated schedule if successful.
+     * @throws IllegalArgumentException if the schedule to update is not found.
+     * @see UpdateScheduleCommand
+     * @see Schedule
+     * @see DayOfWeek
+     */
     @Override
     public Optional<Schedule> handle(UpdateScheduleCommand command) {
         var scheduleOpt = scheduleRepository.findById(command.scheduleId());
