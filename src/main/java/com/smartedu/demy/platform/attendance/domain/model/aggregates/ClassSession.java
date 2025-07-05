@@ -19,6 +19,7 @@ import lombok.Getter;
  * It is responsible for handling the CreateClassSessionCommand command.
  * @since 1.0
  */
+
 @Entity
  public class ClassSession extends AuditableAbstractAggregateRoot<ClassSession> {
   @Embedded
@@ -33,10 +34,16 @@ import lombok.Getter;
  @Getter
  private List<AttendanceRecord> attendance = new ArrayList<>();
 
+
+ /**
+  * Required by JPA.
+  */
   protected ClassSession(){}
 
  /**
+  * Creates a new ClassSession from a CreateClassSessionCommand.
   *
+  * @param command the command containing course ID, date, and initial attendance list
   */
  public ClassSession(CreateClassSessionCommand command){
   this.courseId = command.courseId();
@@ -45,7 +52,11 @@ import lombok.Getter;
           new AttendanceRecord(draft.dni(), draft.status())
   ));
  }
- /** Agregar asistencia garantizando consistencia */
+ /**
+  * Adds an attendance record to this class session while maintaining consistency.
+  *
+  * @param record the attendance record to add
+  */
  public void addAttendance(AttendanceRecord record) {
   record.setClassSession(this);
   this.attendance.add(record);
@@ -56,4 +67,13 @@ import lombok.Getter;
   record.setClassSession(null);
   this.attendance.remove(record);
  }
+ /**
+  * Replaces the entire attendance list.
+  * @param attendance the new list of attendance records
+  */
+ /** Reemplazar completamente la lista de attendance */
+ public void setAttendance(List<AttendanceRecord> attendance) {
+  this.attendance = attendance;
+ }
+
 }
