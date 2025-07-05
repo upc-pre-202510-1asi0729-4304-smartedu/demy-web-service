@@ -11,7 +11,15 @@ import java.util.Objects;
 
 
 /**
- *AttendanceRecord Entity
+ * AttendanceRecord Entity.
+ *
+ * <p>
+ * Represents the attendance of a single student in a class session,
+ * linking the student's identifier (DNI) and their attendance status.
+ * This entity is part of the Attendance bounded context.
+ * </p>
+ *
+ * @since 1.0
  */
 @Entity
 @Table(name = "attendance_record")
@@ -32,10 +40,26 @@ public class AttendanceRecord extends AuditableModel {
     @JoinColumn(name = "class_session_id", nullable = false)
     private ClassSession classSession;
 
-    /** Constructor requerido por JPA */
+    /**
+     * Transient field used for projection only (e.g., displaying student name without persistence).
+     */
+    @Transient
+    @Setter
+    private String studentName;
+
+    /**
+     * Required by JPA.
+     */
     protected AttendanceRecord() {}
 
-    /** Constructor de negocio */
+
+    /**
+     * Creates a new AttendanceRecord with the given student DNI and attendance status.
+     *
+     * @param dni    the student's unique identifier (DNI), must not be null
+     * @param status the attendance status, must not be null
+     * @throws NullPointerException if dni or status is null
+     */
     public AttendanceRecord(Dni dni, AttendanceStatus status) {
         this.dni = Objects.requireNonNull(dni, "StudentId must not be null");
         this.status = Objects.requireNonNull(status, "Status must not be null");
