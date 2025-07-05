@@ -24,7 +24,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 /**
  * REST controller for managing weekly schedules. It provides endpoints for creating,
  * retrieving, updating, deleting weekly schedules, and managing associated schedules.
- *
  * This controller interacts with {@link WeeklyScheduleCommandService} for handling
  * commands related to weekly schedule creation, updating, deletion, and adding/removing
  * schedules, and with {@link WeeklyScheduleQueryService} for handling queries related to

@@ -27,7 +27,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 /**
  * REST controller for managing classrooms. It provides endpoints for creating,
  * retrieving, updating, and deleting classrooms.
- *
  * This controller interacts with the {@link ClassroomCommandService} for handling
  * commands related to classroom creation, updating, and deletion, and the
  * {@link ClassroomQueryService} for handling queries related to retrieving
