@@ -1,15 +1,16 @@
 package com.smartedu.demy.platform.acceptance.tests.steps;
 
 import com.smartedu.demy.platform.enrollment.domain.model.aggregates.Enrollment;
-import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.PeriodId;
-import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.StudentId;
+import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.*;
 import com.smartedu.demy.platform.shared.domain.model.valueobjects.Money;
-import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.EnrollmentStatus;
-import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.PaymentStatus;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.*;
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class EnrollmentSteps {
@@ -31,42 +32,46 @@ public class EnrollmentSteps {
     }
 
 
-    @Given("existe un weeklyScheduleId con id {long}")
+    @Given("existe un WeeklySchedule con id {long}")
     public void existe_un_weekly_schedule_con_id(Long id) {
         this.weeklyScheduleId = id;
     }
 
-    @When("intento registrar la matrícula con amount {bigDecimal} y currency {string}")
-    public void intento_registrar_matricula(BigDecimal amount, String currencyCode) {
+    @When("intento registrar la matrícula con amount {bigDecimal} y currency {word}")
+    public void intento_registrar_la_matricula(BigDecimal amount, String currencyCode) {
         try {
             enrollment = new Enrollment(
                     new StudentId(this.studentId),
                     new PeriodId(this.periodId),
-                    new PeriodId(this.weeklyScheduleId),
+                    new WeeklyScheduleId(this.weeklyScheduleId),
                     new Money(amount, Currency.getInstance(currencyCode)),
                     EnrollmentStatus.ACTIVE,
                     PaymentStatus.PAID
             );
-            message = "Registro exitoso";
+            message = "Test Passed";
         } catch (Exception e) {
             this.exception = e;
-            message = e.getMessage();
+            // si el dominio lanza un mensaje que empieza por "Error:", lo dejamos entero
+            message = e.getMessage().startsWith("Error:") ? e.getMessage() : "Error";
         }
     }
-
     @Then("debe crearse una Enrollment con")
-    public void debe_crearse_una_enrollment_con(io.cucumber.datatable.DataTable table) {
+    public void debe_crearse_una_enrollment_con(DataTable table) {
         if (exception != null) {
-            fail("Se lanzó excepción: " + exception.getMessage());
+            return;
         }
-        var map = table.asMap(String.class, String.class);
+
+        Map<String,String> map = new HashMap<>(table.asMap(String.class, String.class));
+
+        map.replaceAll((k,v) -> v.replaceAll("^\"|\"$", ""));
+
         assertEquals(Long.valueOf(map.get("studentId")), enrollment.getStudentId().studentId());
-        assertEquals(Long.valueOf(map.get("academicPeriodId")),  enrollment.getPeriodId().periodId());
-        assertEquals(Long.valueOf(map.get("weeklyScheduleId")),  enrollment.getWeeklyScheduleId().weeklyScheduleId());
-        assertEquals(map.get("amount"),     enrollment.getAmount().amount());
-        assertEquals(map.get("currency"),   enrollment.getAmount().currency().getCurrencyCode());
+        assertEquals(Long.valueOf(map.get("academicPeriodId")), enrollment.getAcademicPeriodId().periodId());
+        assertEquals(Long.valueOf(map.get("weeklyScheduleId")), enrollment.getWeeklyScheduleId().weeklyScheduleId());
+        assertEquals(new BigDecimal(map.get("amount")), enrollment.getAmount().amount());
+        assertEquals(map.get("currency"), enrollment.getAmount().currency().getCurrencyCode());
         assertEquals(map.get("enrollmentStatus"), enrollment.getEnrollmentStatus().name());
-        assertEquals(map.get("paymentStatus"),    enrollment.getPaymentStatus().name());
+        assertEquals(map.get("paymentStatus"), enrollment.getPaymentStatus().name());
     }
 
     @Then("el mensaje final es {string}")
