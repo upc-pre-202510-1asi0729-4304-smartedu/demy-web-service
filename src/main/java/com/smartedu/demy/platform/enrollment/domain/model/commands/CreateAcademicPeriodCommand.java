@@ -13,5 +13,11 @@ public record CreateAcademicPeriodCommand (String periodName, LocalDate startDat
         if (startDate == null || endDate == null) {
             throw new IllegalArgumentException("startDate and endDate must not be null");
         }
+        if (startDate.isAfter(endDate)) {
+            throw new IllegalArgumentException("startDate must be after endDate");
+        }
+        if (isActive == null) {
+            throw new IllegalArgumentException("isActive cannot be null");
+        }
     }
 }
