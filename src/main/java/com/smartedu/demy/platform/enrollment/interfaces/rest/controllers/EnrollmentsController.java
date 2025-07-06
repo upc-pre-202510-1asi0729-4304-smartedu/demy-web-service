@@ -23,6 +23,10 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * REST Controller for managing enrollments.
+ * Provides endpoints to create, retrieve, update, and delete enrollments.
+ */
 @RestController
 @RequestMapping(value = "/api/v1/enrollments", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Enrollments", description = "Available Enrollment Endpoints")
@@ -31,11 +35,23 @@ public class EnrollmentsController {
     private final EnrollmentCommandService enrollmentCommandService;
     private final EnrollmentQueryService enrollmentQueryService;
 
+    /**
+     * Constructs the controller with the required services.
+     *
+     * @param enrollmentCommandService service to handle commands (create, update, delete)
+     * @param enrollmentQueryService service to handle queries (fetch enrollments)
+     */
     public EnrollmentsController(EnrollmentCommandService enrollmentCommandService, EnrollmentQueryService enrollmentQueryService) {
         this.enrollmentCommandService = enrollmentCommandService;
         this.enrollmentQueryService = enrollmentQueryService;
     }
 
+    /**
+     * Creates a new enrollment.
+     *
+     * @param resource the request body containing enrollment data
+     * @return ResponseEntity with the created enrollment or error status
+     */
     @PostMapping
     @Operation(summary = "Create a new enrollment", description = "Registers a new enrollment")
     @ApiResponses(value = {
@@ -54,6 +70,11 @@ public class EnrollmentsController {
         return new ResponseEntity<>(resourceResponse, HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves all enrollments.
+     *
+     * @return list of enrollment resources
+     */
     @GetMapping
     @Operation(summary = "Get all enrollments", description = "Retrieves all enrollments")
     @ApiResponses(value = {
@@ -70,6 +91,12 @@ public class EnrollmentsController {
         return ResponseEntity.ok(resources);
     }
 
+    /**
+     * Retrieves a specific enrollment by its ID.
+     *
+     * @param enrollmentId the ID of the enrollment
+     * @return the enrollment resource or not found
+     */
     @GetMapping("/{enrollmentId}")
     @Operation(summary = "Get enrollment by ID", description = "Retrieve a specific enrollment by its ID")
     @ApiResponses(value = {
@@ -84,6 +111,12 @@ public class EnrollmentsController {
         return ResponseEntity.ok(resource);
     }
 
+    /**
+     * Retrieves all enrollments by a specific student ID.
+     *
+     * @param studentId the ID of the student
+     * @return list of enrollments for the given student
+     */
     @GetMapping("/student/{studentId}")
     @Operation(summary = "Get all enrollments by student ID", description = "Returns enrollments for a specific student ID")
     public ResponseEntity<List<EnrollmentResource>> getEnrollmentsByStudentId(@PathVariable Long studentId) {
@@ -96,6 +129,12 @@ public class EnrollmentsController {
         return ResponseEntity.ok(resources);
     }
 
+    /**
+     * Retrieves all enrollments by a student's DNI.
+     *
+     * @param dni the student's DNI
+     * @return list of enrollments for the given DNI
+     */
     @GetMapping("/student/dni/{dni}")
     @Operation(summary = "Get all enrollments by student DNI", description = "Returns enrollments using the student's DNI")
     public ResponseEntity<List<EnrollmentResource>> getEnrollmentsByStudentDni(@PathVariable String dni) {
@@ -112,6 +151,13 @@ public class EnrollmentsController {
         }
     }
 
+    /**
+     * Updates an existing enrollment by ID.
+     *
+     * @param enrollmentId the ID of the enrollment to update
+     * @param resource the request body with updated enrollment data
+     * @return the updated enrollment resource or not found
+     */
     @PutMapping("/{enrollmentId}")
     @Operation(summary = "Update enrollment", description = "Update an existing enrollment")
     public ResponseEntity<EnrollmentResource> updateEnrollment(@PathVariable Long enrollmentId, @RequestBody UpdateEnrollmentResource resource) {
@@ -123,6 +169,12 @@ public class EnrollmentsController {
         return ResponseEntity.ok(resourceResponse);
     }
 
+    /**
+     * Deletes an enrollment by its ID.
+     *
+     * @param enrollmentId the ID of the enrollment to delete
+     * @return a message confirming deletion
+     */
     @DeleteMapping("/{enrollmentId}")
     @Operation(summary = "Delete enrollment", description = "Deletes an enrollment by ID")
     public ResponseEntity<String> deleteEnrollment(@PathVariable Long enrollmentId) {
