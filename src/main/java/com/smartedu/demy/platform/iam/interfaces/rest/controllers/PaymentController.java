@@ -22,7 +22,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @CrossOrigin(origins = "*")
 @Tag(name = "Payments", description = "Stripe payment processing endpoints")
 public class PaymentController {
-
     @Value("${stripe.secret-key}")
     private String stripeKey;
 
