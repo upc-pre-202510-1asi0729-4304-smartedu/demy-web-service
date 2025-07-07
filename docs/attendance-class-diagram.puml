@@ -1,0 +1,107 @@
+@startuml
+package demy-platform-backend as demy_platform_backend {
+  package attendance {
+    package domain {
+      package model {
+        package aggregates {
+          class ClassSession<<aggregate root>> {}
+          }
+        package commands {
+          class CreateClassSessionCommand<<record>>{}
+          }
+        package valueobjects {
+          class AttendanceRecord{}
+          enum AttendanceStatus{}
+          }
+      }
+      package services {
+         interface ClassSessionCommandService{}
+         }
+    }
+    package application.internal.commandservices {
+    class ClassSessionCommandServiceImpl{}
+    }
+
+    package infrastructure.persistence.jpa {
+     interface ClassSessionRepository{}
+    }
+    package interfaces.rest {
+      package controllers {
+          class ClassSessionController {}
+          }
+      package resources {
+          class ClassSessionResource{}
+          class CreateClassSessionResource{}
+          class AttendanceRecordResource{}
+      }
+      package transform {
+         class ClassSessionResourceFromEntityAssembler{}
+         class CreateClassSessionCommandFromResourceAssembler{}
+      }
+    }
+  }
+
+  package shared {
+    package domain {
+      package model {
+        package aggregates {
+           class AuditableAbstractAggregateRoot{}
+           }
+        package entities {
+           class  AuditableModel{}
+        }
+        package valueobjects {
+         class CourseId{}
+          class StudentId{}
+        }
+      }
+    }
+    package infrastructure {}
+  }
+}
+
+package org.springframework.data.domain {}
+package org.hibernate.boot.model.naming {}
+
+demy_platform_backend.attendance.domain.model.aggregates.ClassSession ..> demy_platform_backend.shared.domain.model.aggregates.AuditableAbstractAggregateRoot
+demy_platform_backend.attendance.domain.model.aggregates.ClassSession ..> demy_platform_backend.shared.domain.model.valueobjects.CourseId
+demy_platform_backend.attendance.domain.model.aggregates.ClassSession ..> demy_platform_backend.attendance.domain.model.valueobjects.AttendanceRecord
+demy_platform_backend.attendance.domain.model.aggregates.ClassSession ..> demy_platform_backend.attendance.domain.model.commands.CreateClassSessionCommand
+
+demy_platform_backend.attendance.domain.model.valueobjects.AttendanceRecord ..> demy_platform_backend.shared.domain.model.valueobjects.StudentId
+
+demy_platform_backend.attendance.domain.model.commands.CreateClassSessionCommand ..> demy_platform_backend.shared.domain.model.valueobjects.CourseId
+demy_platform_backend.attendance.domain.model.commands.CreateClassSessionCommand ..> demy_platform_backend.attendance.domain.model.valueobjects.AttendanceRecord
+
+demy_platform_backend.attendance.domain.services.ClassSessionCommandService ..> demy_platform_backend.attendance.domain.model.aggregates.ClassSession
+demy_platform_backend.attendance.domain.services.ClassSessionCommandService ..> demy_platform_backend.attendance.domain.model.commands.CreateClassSessionCommand
+
+demy_platform_backend.attendance.infrastructure.persistence.jpa.ClassSessionRepository ..> demy_platform_backend.attendance.domain.model.aggregates.ClassSession
+demy_platform_backend.attendance.infrastructure.persistence.jpa.ClassSessionRepository ..> demy_platform_backend.shared.domain.model.valueobjects.CourseId
+
+
+demy_platform_backend.attendance.application.internal.commandservices.ClassSessionCommandServiceImpl ..> demy_platform_backend.attendance.domain.model.aggregates.ClassSession
+demy_platform_backend.attendance.application.internal.commandservices.ClassSessionCommandServiceImpl ..> demy_platform_backend.attendance.domain.model.commands.CreateClassSessionCommand
+demy_platform_backend.attendance.application.internal.commandservices.ClassSessionCommandServiceImpl ..> demy_platform_backend.attendance.domain.services.ClassSessionCommandService
+demy_platform_backend.attendance.application.internal.commandservices.ClassSessionCommandServiceImpl ..> demy_platform_backend.attendance.infrastructure.persistence.jpa.ClassSessionRepository
+
+demy_platform_backend.attendance.interfaces.rest.transform.ClassSessionResourceFromEntityAssembler ..> demy_platform_backend.attendance.domain.model.aggregates.ClassSession
+demy_platform_backend.attendance.interfaces.rest.transform.ClassSessionResourceFromEntityAssembler ..> demy_platform_backend.attendance.interfaces.rest.resources.AttendanceRecordResource
+demy_platform_backend.attendance.interfaces.rest.transform.ClassSessionResourceFromEntityAssembler ..>  demy_platform_backend.attendance.interfaces.rest.resources.ClassSessionResource
+
+demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler ..> demy_platform_backend.attendance.domain.model.commands.CreateClassSessionCommand
+demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler ..> demy_platform_backend.shared.domain.model.valueobjects.CourseId
+demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler ..> demy_platform_backend.shared.domain.model.valueobjects.StudentId
+demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler ..> demy_platform_backend.attendance.domain.model.valueobjects.AttendanceRecord
+demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler ..> demy_platform_backend.attendance.domain.model.valueobjects.AttendanceStatus
+demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler ..> demy_platform_backend.attendance.interfaces.rest.resources.CreateClassSessionResource
+
+demy_platform_backend.attendance.interfaces.rest.controllers.ClassSessionController ..> demy_platform_backend.attendance.domain.model.aggregates.ClassSession
+demy_platform_backend.attendance.interfaces.rest.controllers.ClassSessionController ..>  demy_platform_backend.attendance.domain.services.ClassSessionCommandService
+demy_platform_backend.attendance.interfaces.rest.controllers.ClassSessionController ..>  demy_platform_backend.attendance.interfaces.rest.resources.ClassSessionResource
+demy_platform_backend.attendance.interfaces.rest.controllers.ClassSessionController ..>  demy_platform_backend.attendance.interfaces.rest.resources.CreateClassSessionResource
+demy_platform_backend.attendance.interfaces.rest.controllers.ClassSessionController ..>  demy_platform_backend.attendance.interfaces.rest.transform.ClassSessionResourceFromEntityAssembler
+demy_platform_backend.attendance.interfaces.rest.controllers.ClassSessionController ..>  demy_platform_backend.attendance.interfaces.rest.transform.CreateClassSessionCommandFromResourceAssembler
+demy_platform_backend.shared.infrastructure ..> org.hibernate.boot.model.naming
+demy_platform_backend.shared.domain.model.aggregates ..> org.springframework.data.domain
+@enduml

@@ -8,7 +8,7 @@ package com.smartedu.demy.platform.attendance.interfaces.rest.resources;
  * @since 1.0
  */
 public record AttendanceRecordResource(
-        String studentId,
+        String dni,
         String status
 ) {
     /**
@@ -16,8 +16,8 @@ public record AttendanceRecordResource(
      * @throws IllegalArgumentException If studentId or status is null or empty
      */
     public AttendanceRecordResource{
-        if(studentId == null || studentId.isEmpty())
-            throw new IllegalArgumentException("Student ID cannot be null");
+        if(dni == null || dni.isEmpty())
+            throw new IllegalArgumentException("Student DNI cannot be null");
         if(status == null || status.isBlank())
             throw new IllegalArgumentException("Status cannot be null");
     }
