@@ -1,5 +1,13 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to update the details of an existing course.
+ *
+ * @param courseId The unique identifier of the course to be updated.
+ * @param name The new name of the course.
+ * @param code The new code for the course.
+ * @param description The updated description of the course.
+ */
 public record UpdateCourseCommand(
         Long courseId,
         String name,

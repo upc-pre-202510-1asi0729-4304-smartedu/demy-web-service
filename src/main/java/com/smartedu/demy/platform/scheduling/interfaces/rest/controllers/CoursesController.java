@@ -1,4 +1,4 @@
-package com.smartedu.demy.platform.scheduling.interfaces.rest.controller;
+package com.smartedu.demy.platform.scheduling.interfaces.rest.controllers;
 
 import com.smartedu.demy.platform.scheduling.domain.model.commands.DeleteCourseCommand;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllCoursesQuery;
@@ -23,19 +23,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
+/**
+ * REST controller for managing courses. It provides endpoints for creating,
+ * retrieving, updating, and deleting courses.
+ * This controller interacts with the {@link CourseCommandService} for handling
+ * commands related to course creation, updating, and deletion, and the
+ * {@link CourseQueryService} for handling queries related to retrieving
+ * courses.
+ */
 @RestController
 @RequestMapping(value = "/api/v1/courses", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Courses", description = "Course Management Endpoints")
-public class CourseController {
+public class CoursesController {
 
     private final CourseCommandService courseCommandService;
     private final CourseQueryService courseQueryService;
 
-    public CourseController(CourseCommandService courseCommandService, CourseQueryService courseQueryService) {
+    public CoursesController(CourseCommandService courseCommandService, CourseQueryService courseQueryService) {
         this.courseCommandService = courseCommandService;
         this.courseQueryService = courseQueryService;
     }
 
+    /**
+     * Creates a new course based on the provided resource.
+     *
+     * @param resource The resource containing the details of the course to be created.
+     * @return A {@link ResponseEntity} with the created course or an error response.
+     */
     @PostMapping
     @Operation(summary = "Create a new course", description = "Create a new course")
     @ApiResponses(value = {
@@ -44,35 +58,26 @@ public class CourseController {
             @ApiResponse(responseCode = "404", description = "Course not found")
     })
     public ResponseEntity<CourseResource> createCourse(@RequestBody CreateCourseResource resource) {
-        // Convierte el recurso en un comando de creación de curso
         var createCourseCommand = CreateCourseCommandFromResourceAssembler.toCommandFromResource(resource);
-
-        // Maneja el comando para crear el curso (devuelve el ID del curso o 0L si hay un error)
         var courseId = courseCommandService.handle(createCourseCommand);
-
-        // Verifica si el ID del curso es 0L, lo que puede indicar un error
         if (courseId == null || courseId == 0L ) {
             return ResponseEntity.badRequest().build();
         }
-
-        // Consulta el curso por ID usando el ID recibido
         var getCourseByIdQuery = new GetCourseByIdQuery(courseId);
         var course = courseQueryService.handle(getCourseByIdQuery);
-
-        // Si no se encuentra el curso, devuelve un 404
         if (course.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         var courseEntity = course.get();
-
-        // Convierte el curso en un recurso para devolverlo
         var courseResource = CourseResourceFromEntityAssembler.toResourceFromEntity(courseEntity);
-
-        // Devuelve el recurso con el código de estado 201 (creado)
         return new ResponseEntity<>(courseResource, HttpStatus.CREATED);
     }
 
+    /**
+     * Retrieves all courses.
+     *
+     * @return A {@link ResponseEntity} containing a list of courses or an error response.
+     */
     @GetMapping
     @Operation(summary = "Get all courses", description = "Get all courses")
     @ApiResponses(value = {
@@ -91,6 +96,12 @@ public class CourseController {
         return ResponseEntity.ok(courseResources);
     }
 
+    /**
+     * Retrieves a course by its ID.
+     *
+     * @param courseId The ID of the course to retrieve.
+     * @return A {@link ResponseEntity} containing the course resource or an error response.
+     */
     @GetMapping("/{courseId}")
     @Operation(summary = "Get course by ID", description = "Get a course by ID")
     @ApiResponses(value = {
@@ -107,6 +118,13 @@ public class CourseController {
         return ResponseEntity.ok(courseResource);
     }
 
+    /**
+     * Updates a course by its ID.
+     *
+     * @param courseId The ID of the course to update.
+     * @param resource The resource containing the updated course details.
+     * @return A {@link ResponseEntity} containing the updated course or an error response.
+     */
     @PutMapping("/{courseId}")
     @Operation(summary = "Update a course by ID", description = "Update a course by ID")
     @ApiResponses(value = {
@@ -125,6 +143,12 @@ public class CourseController {
         return ResponseEntity.ok(courseResource);
     }
 
+    /**
+     * Deletes a course by its ID.
+     *
+     * @param courseId The ID of the course to delete.
+     * @return A {@link ResponseEntity} indicating the deletion status.
+     */
     @DeleteMapping("/{courseId}")
     @Operation(summary = "Delete a course by ID", description = "Delete a course by ID")
     @ApiResponses(value = {

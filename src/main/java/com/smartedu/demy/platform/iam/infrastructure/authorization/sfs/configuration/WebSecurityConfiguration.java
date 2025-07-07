@@ -107,12 +107,13 @@ public class WebSecurityConfiguration {
                                 "/api/v1/authentication/**",
                                 "/api/v1/users/sign-in",
                                 "/api/v1/users/admins/sign-up",
+                                "/api/v1/users/reset-password",
                                 "/v3/api-docs/**",
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/swagger-resources/**",
                                 "/webjars/**").permitAll()
-                        .anyRequest().authenticated());
+                        .anyRequest().permitAll());
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();

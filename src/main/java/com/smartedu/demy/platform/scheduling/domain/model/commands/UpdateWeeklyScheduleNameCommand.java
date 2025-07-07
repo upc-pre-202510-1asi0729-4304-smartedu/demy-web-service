@@ -1,5 +1,11 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to update the name of an existing weekly schedule.
+ *
+ * @param weeklyScheduleId The unique identifier of the weekly schedule to be updated.
+ * @param name The new name to be assigned to the weekly schedule.
+ */
 public record UpdateWeeklyScheduleNameCommand(
         Long weeklyScheduleId,
         String name

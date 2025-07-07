@@ -1,7 +1,9 @@
 package com.smartedu.demy.platform.scheduling.domain.services;
 
 import com.smartedu.demy.platform.scheduling.domain.model.aggregates.WeeklySchedule;
+import com.smartedu.demy.platform.scheduling.domain.model.entities.Schedule;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllWeeklySchedulesQuery;
+import com.smartedu.demy.platform.scheduling.domain.model.queries.GetSchedulesByTeacherIdQuery;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetWeeklyScheduleByIdQuery;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetWeeklyScheduleByNameQuery;
 
@@ -16,5 +18,6 @@ public interface WeeklyScheduleQueryService {
 
     Optional<WeeklySchedule> handle(GetWeeklyScheduleByNameQuery query);
 
+    List<Schedule> handle(GetSchedulesByTeacherIdQuery query);
 
 }

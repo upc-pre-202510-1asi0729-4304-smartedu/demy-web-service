@@ -58,42 +58,14 @@ public class WeeklySchedule extends AuditableAbstractAggregateRoot<WeeklySchedul
     }
 
     /**
-     * Add schedule
-     * @param schedule Schedule to add
-     */
-    public void addSchedule(Schedule schedule) {
-        if (schedule == null) {
-            throw new IllegalArgumentException("Schedule must not be null");
-        }
-
-        if (hasConflictWith(schedule)) {
-            throw new IllegalArgumentException("Schedule conflicts with existing schedule in the same classroom and time slot");
-        }
-
-        schedules.add(schedule);
-    }
-
-//    /**
-//     * Add schedule with parameters
-//     * @param startTime Start time
-//     * @param endTime End time
-//     * @param dayOfWeek Day of week
-//     * @param courseId Course ID
-//     * @param classroomId Classroom ID
-//     */
-//    public void addSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId) {
-//        var schedule = new Schedule(startTime, endTime, dayOfWeek, courseId, classroomId);
-//        schedules.add(schedule);
-//    }
-
-    /**
-     * Add schedule with parameters
-     * @param startTime Start time
-     * @param endTime End time
-     * @param dayOfWeek Day of week
-     * @param courseId Course ID
-     * @param classroomId Classroom ID
-     * @param teacherId Teacher ID
+     * Add schedule with parameters.
+     *
+     * @param startTime Start time of the schedule
+     * @param endTime End time of the schedule
+     * @param dayOfWeek Day of the week for the schedule
+     * @param courseId ID of the course
+     * @param classroomId ID of the classroom
+     * @param teacherId ID of the teacher
      */
     public void addSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId, Long teacherId) {
         var schedule = new Schedule(startTime, endTime, dayOfWeek, courseId, classroomId, teacherId);
@@ -103,53 +75,12 @@ public class WeeklySchedule extends AuditableAbstractAggregateRoot<WeeklySchedul
     }
 
     /**
-     * Remove schedule
-     * @param scheduleId Schedule ID to remove
+     * Remove a schedule from the list by its ID.
+     *
+     * @param scheduleId ID of the schedule to remove
      */
     public void removeSchedule(Long scheduleId) {
         schedules.removeIf(s -> s.getId().equals(scheduleId));
     }
 
-    /**
-     * Check if has conflicts
-     * @return True if has conflicts, false otherwise
-     */
-    public boolean hasConflicts() {
-        for (int i = 0; i < schedules.size(); i++) {
-            for (int j = i + 1; j < schedules.size(); j++) {
-                if (schedules.get(i).conflictsWith(schedules.get(j))) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Get conflicts
-     * @return List of conflicting schedule pairs
-     */
-    public List<ScheduleConflict> getConflicts() {
-        var conflicts = new ArrayList<ScheduleConflict>();
-
-        for (int i = 0; i < schedules.size(); i++) {
-            for (int j = i + 1; j < schedules.size(); j++) {
-                if (schedules.get(i).conflictsWith(schedules.get(j))) {
-                    conflicts.add(new ScheduleConflict(schedules.get(i), schedules.get(j)));
-                }
-            }
-        }
-
-        return conflicts;
-    }
-
-
-    private boolean hasConflictWith(Schedule newSchedule) {
-        return schedules.stream().anyMatch(existingSchedule -> existingSchedule.conflictsWith(newSchedule));
-    }
-
-    /**
-     * Schedule Conflict record
-     */
-    public record ScheduleConflict(Schedule schedule1, Schedule schedule2) {}
 }

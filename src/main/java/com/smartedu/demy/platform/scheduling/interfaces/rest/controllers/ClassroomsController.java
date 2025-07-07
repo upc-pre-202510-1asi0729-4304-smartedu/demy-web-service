@@ -1,5 +1,5 @@
 
-package com.smartedu.demy.platform.scheduling.interfaces.rest.controller;
+package com.smartedu.demy.platform.scheduling.interfaces.rest.controllers;
 
 import com.smartedu.demy.platform.scheduling.domain.model.commands.DeleteClassroomCommand;
 import com.smartedu.demy.platform.scheduling.domain.model.queries.GetAllClassroomsQuery;
@@ -24,20 +24,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-
+/**
+ * REST controller for managing classrooms. It provides endpoints for creating,
+ * retrieving, updating, and deleting classrooms.
+ * This controller interacts with the {@link ClassroomCommandService} for handling
+ * commands related to classroom creation, updating, and deletion, and the
+ * {@link ClassroomQueryService} for handling queries related to retrieving
+ * classrooms.
+ */
 @RestController
 @RequestMapping(value = "/api/v1/classrooms", produces = APPLICATION_JSON_VALUE)
 @Tag(name = "Classrooms", description = "Classroom Management Endpoints")
-public class ClassroomController {
+public class ClassroomsController {
 
     private final ClassroomCommandService classroomCommandService;
     private final ClassroomQueryService classroomQueryService;
 
-    public ClassroomController(ClassroomCommandService classroomCommandService, ClassroomQueryService classroomQueryService) {
+    public ClassroomsController(ClassroomCommandService classroomCommandService, ClassroomQueryService classroomQueryService) {
         this.classroomCommandService = classroomCommandService;
         this.classroomQueryService = classroomQueryService;
     }
 
+    /**
+     * Creates a new classroom based on the provided resource.
+     *
+     * @param resource The resource containing the details of the classroom to be created.
+     * @return A {@link ResponseEntity} with the created classroom or an error response.
+     */
     @PostMapping
     @Operation(summary = "Create a new classroom", description = "Create a new classroom")
     @ApiResponses(value = {
@@ -46,36 +59,27 @@ public class ClassroomController {
             @ApiResponse(responseCode = "404", description = "Classroom not found")
     })
     public ResponseEntity<ClassroomResource> createClassroom(@RequestBody CreateClassroomResource resource) {
-        // Convierte el recurso en un comando de creación de aula
         var createClassroomCommand = CreateClassroomCommandFromResourceAssembler.toCommandFromResource(resource);
-
-        // Maneja el comando para crear el aula (devuelve el ID del aula o 0L si hay un error)
         var classroomId = classroomCommandService.handle(createClassroomCommand);
-
-        // Verifica si el ID del aula es 0L, lo que puede indicar un error
         if (classroomId == null || classroomId == 0L ) {
             return ResponseEntity.badRequest().build();
         }
-
-        // Consulta el aula por ID usando el ID recibido
         var getClassroomByIdQuery = new GetClassroomByIdQuery(classroomId);
         var classroom = classroomQueryService.handle(getClassroomByIdQuery);
 
-        // Si no se encuentra el aula, devuelve un 404
         if (classroom.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
         var classroomEntity = classroom.get();
-
-        // Convierte el aula en un recurso para devolverlo
         var classroomResource = ClassroomResourceFromEntityAssembler.toResourceFromEntity(classroomEntity);
-
-        // Devuelve el recurso con el código de estado 201 (creado)
         return new ResponseEntity<>(classroomResource, HttpStatus.CREATED);
     }
 
-
+    /**
+     * Retrieves all classrooms.
+     *
+     * @return A {@link ResponseEntity} containing a list of classrooms or an error response.
+     */
     @GetMapping
     @Operation(summary = "Get all classrooms", description = "Get all classrooms")
     @ApiResponses(value = {
@@ -94,6 +98,12 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomResources);
     }
 
+    /**
+     * Retrieves a classroom by its ID.
+     *
+     * @param classroomId The ID of the classroom to retrieve.
+     * @return A {@link ResponseEntity} containing the classroom resource or an error response.
+     */
     @GetMapping("/{classroomId}")
     @Operation(summary = "Get classroom by ID", description = "Get a classroom by ID")
     @ApiResponses(value = {
@@ -110,6 +120,13 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomResource);
     }
 
+    /**
+     * Updates a classroom by its ID.
+     *
+     * @param classroomId The ID of the classroom to update.
+     * @param resource The resource containing the updated classroom details.
+     * @return A {@link ResponseEntity} containing the updated classroom or an error response.
+     */
     @PutMapping("/{classroomId}")
     @Operation(summary = "Update a classroom by ID", description = "Update a classroom by ID")
     @ApiResponses(value = {
@@ -128,6 +145,12 @@ public class ClassroomController {
         return ResponseEntity.ok(classroomResource);
     }
 
+    /**
+     * Deletes a classroom by its ID.
+     *
+     * @param classroomId The ID of the classroom to delete.
+     * @return A {@link ResponseEntity} indicating the deletion status.
+     */
     @DeleteMapping("/{classroomId}")
     @Operation(summary = "Delete a classroom by ID", description = "Delete a classroom by ID")
     @ApiResponses(value = {

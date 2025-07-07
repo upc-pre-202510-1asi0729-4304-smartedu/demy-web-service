@@ -5,15 +5,30 @@ import com.smartedu.demy.platform.scheduling.domain.services.WeeklyScheduleQuery
 import com.smartedu.demy.platform.scheduling.interfaces.acl.WeeklySchedulesContextFacade;
 import org.springframework.stereotype.Service;
 
+/**
+ * Weekly Schedules Context Facade Implementation
+ * <p>This class provides a simplified interface for accessing weekly schedule services from other bounded contexts, implementing the Anti-Corruption Layer (ACL) pattern.</p>
+ */
 @Service
 public class WeeklySchedulesContextFacadeImpl implements WeeklySchedulesContextFacade {
 
     private final WeeklyScheduleQueryService weeklyScheduleQueryService;
 
+    /**
+     * Constructor that initializes the facade with the required query service.
+     * @param weeklyScheduleQueryService The weekly schedule query service.
+     */
     public WeeklySchedulesContextFacadeImpl(WeeklyScheduleQueryService weeklyScheduleQueryService) {
         this.weeklyScheduleQueryService = weeklyScheduleQueryService;
     }
 
+    /**
+     * This method is used to fetch a weekly schedule ID by its name.
+     * @param name The name of the weekly schedule to search for.
+     * @return The ID of the weekly schedule if found, otherwise 0L.
+     * @see GetWeeklyScheduleByNameQuery
+     * @see WeeklyScheduleQueryService
+     */
     @Override
     public Long fetchWeeklyScheduleIdByName(String name) {
         var getWeeklyScheduleByNameQuery = new GetWeeklyScheduleByNameQuery(name);

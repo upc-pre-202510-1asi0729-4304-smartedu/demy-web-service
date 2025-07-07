@@ -1,5 +1,11 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to delete a classroom based on its unique identifier.
+ *
+ * @param classroomId The unique identifier of the classroom to be deleted.
+ *
+ */
 public record DeleteClassroomCommand(Long classroomId) {
 
     public DeleteClassroomCommand {

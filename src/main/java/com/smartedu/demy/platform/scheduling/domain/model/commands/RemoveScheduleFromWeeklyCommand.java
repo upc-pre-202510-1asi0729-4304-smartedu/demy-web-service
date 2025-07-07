@@ -1,5 +1,11 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to remove a schedule from a weekly schedule by their unique identifiers.
+ *
+ * @param weeklyScheduleId The unique identifier of the weekly schedule.
+ * @param scheduleId The unique identifier of the schedule to be removed from the weekly schedule.
+ */
 public record RemoveScheduleFromWeeklyCommand(
         Long weeklyScheduleId,
         Long scheduleId

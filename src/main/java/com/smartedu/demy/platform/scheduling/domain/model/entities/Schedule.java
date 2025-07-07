@@ -111,6 +111,11 @@ public class Schedule extends AuditableModel {
     public void updateSchedule(String startTime, String endTime, DayOfWeek dayOfWeek, Long courseId, Long classroomId, Long teacherId) {
         updateSchedule(new TimeRange(startTime, endTime), dayOfWeek, new CourseId(courseId), new ClassroomId(classroomId), new UserId(teacherId));
     }
+    public void updateSchedule(Long classroomId, String startTime, String endTime, DayOfWeek dayOfWeek) {
+        this.timeRange= new TimeRange(startTime,endTime);
+        this.dayOfWeek = dayOfWeek;
+        this.classroomId = new ClassroomId(classroomId);
+    }
 
     public void setWeeklySchedule(WeeklySchedule weeklySchedule) { this.weeklySchedule = weeklySchedule; }
 
