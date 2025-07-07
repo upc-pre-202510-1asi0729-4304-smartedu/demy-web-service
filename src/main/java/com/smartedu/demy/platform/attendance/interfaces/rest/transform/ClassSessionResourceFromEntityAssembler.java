@@ -14,12 +14,12 @@ public class ClassSessionResourceFromEntityAssembler {
      */
     public static ClassSessionResource toResourceFromEntity(ClassSession entity) {
         return new ClassSessionResource(
-                entity.getCourseId().value().toString(),
-                entity.getDate().toString(),
+                entity.getCourseId().value(),
+                entity.getDate(),
                 entity.getAttendance().stream()
                         .map(record -> new AttendanceRecordResource(
-                                record.studentId().value().toString(),
-                                record.status().name()
+                                record.getDni().dni(),
+                                record.getStatus().name()
                         )).toList()
         );
     }

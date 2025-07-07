@@ -1,0 +1,64 @@
+@startuml
+package demy-platform-backend as demy_platform_backend {
+  package attendance {
+    package domain {
+      package model {
+        package aggregates {}
+        package commands {}
+        package valueobjects {}
+      }
+      package services {}
+    }
+    package application.internal.commandservices {}
+    package infrastructure.persistence.jpa {}
+    package interfaces.rest {
+      package controllers {}
+      package resources {}
+      package transform {}
+    }
+  }
+
+  package shared {
+    package domain {
+      package model {
+        package aggregates {}
+        package entities {}
+        package valueobjects {}
+      }
+    }
+    package infrastructure {}
+  }
+}
+
+package org.springframework.data.domain {}
+package org.hibernate.boot.model.naming {}
+
+demy_platform_backend.attendance.domain.model.aggregates ..> demy_platform_backend.shared.domain.model.aggregates
+demy_platform_backend.attendance.domain.model.aggregates ..> demy_platform_backend.shared.domain.model.valueobjects
+demy_platform_backend.attendance.domain.model.aggregates ..> demy_platform_backend.attendance.domain.model.commands
+
+demy_platform_backend.attendance.domain.model.valueobjects ..> demy_platform_backend.shared.domain.model.valueobjects
+
+demy_platform_backend.attendance.domain.model.commands ..> demy_platform_backend.shared.domain.model.valueobjects
+demy_platform_backend.attendance.domain.model.commands ..> demy_platform_backend.attendance.domain.model.valueobjects
+
+demy_platform_backend.attendance.domain.services ..> demy_platform_backend.attendance.domain.model.aggregates
+demy_platform_backend.attendance.domain.services ..> demy_platform_backend.attendance.domain.model.commands
+
+demy_platform_backend.attendance.infrastructure.persistence.jpa ..> demy_platform_backend.attendance.domain.model.aggregates
+demy_platform_backend.attendance.infrastructure.persistence.jpa ..> demy_platform_backend.attendance.domain.model.valueobjects
+
+demy_platform_backend.attendance.application.internal.commandservices ..> demy_platform_backend.attendance.domain.model.aggregates
+demy_platform_backend.attendance.application.internal.commandservices ..> demy_platform_backend.attendance.domain.model.commands
+demy_platform_backend.attendance.application.internal.commandservices ..> demy_platform_backend.attendance.domain.services
+demy_platform_backend.attendance.application.internal.commandservices ..> demy_platform_backend.attendance.infrastructure.persistence.jpa
+
+demy_platform_backend.attendance.interfaces.rest.transform ..> demy_platform_backend.attendance.domain.model.aggregates
+demy_platform_backend.attendance.interfaces.rest.transform ..> demy_platform_backend.attendance.interfaces.rest.resources
+
+demy_platform_backend.attendance.interfaces.rest.controllers ..> demy_platform_backend.attendance.domain.model.aggregates
+demy_platform_backend.attendance.interfaces.rest.controllers ..>  demy_platform_backend.attendance.domain.services
+demy_platform_backend.attendance.interfaces.rest.controllers ..>  demy_platform_backend.attendance.interfaces.rest.resources
+demy_platform_backend.shared.infrastructure ..> org.hibernate.boot.model.naming
+demy_platform_backend.shared.domain.model.aggregates ..> org.springframework.data.domain
+@enduml

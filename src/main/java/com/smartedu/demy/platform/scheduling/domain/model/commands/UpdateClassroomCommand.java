@@ -1,5 +1,13 @@
 package com.smartedu.demy.platform.scheduling.domain.model.commands;
 
+/**
+ * Command to update the details of an existing classroom.
+ *
+ * @param classroomId The unique identifier of the classroom to be updated.
+ * @param code The new code for the classroom.
+ * @param capacity The updated capacity of the classroom.
+ * @param campus The updated campus where the classroom is located.
+ */
 public record UpdateClassroomCommand(
         Long classroomId,
         String code,

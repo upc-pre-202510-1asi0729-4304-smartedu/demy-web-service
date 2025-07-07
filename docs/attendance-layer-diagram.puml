@@ -1,0 +1,23 @@
+@startuml
+package demy-platform-backend as demy_platform_backend {
+  package attendance {
+    package domain {}
+    package application.internal.commandservices {}
+    package infrastructure.persistence.jpa {}
+    package interfaces.rest {}
+  }
+
+  package shared {
+    package domain {}
+    package infrastructure {}
+  }
+}
+
+package org.springframework.data.domain {}
+package org.hibernate.boot.model.naming {}
+
+demy_platform_backend.shared.domain ..> org.springframework.data.domain
+demy_platform_backend.attendance.domain ..> demy_platform_backend.shared.domain
+demy_platform_backend.shared.infrastructure ..> org.hibernate.boot.model.naming
+@enduml
+

@@ -10,15 +10,31 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Classroom Command Service Implementation
+ * <p>This class implements the classroom command service interface and provides the business logic for handling classroom commands such as create, update, and delete operations.</p>
+ */
 @Service
 public class ClassroomCommandServiceImpl implements ClassroomCommandService {
 
     private final ClassroomRepository classroomRepository;
 
+    /**
+     * Constructor that initializes the service with the required repository.
+     * @param classroomRepository The classroom repository.
+     */
     public ClassroomCommandServiceImpl(ClassroomRepository classroomRepository) {
         this.classroomRepository = classroomRepository;
     }
 
+    /**
+     * This method is used to handle the creation of a new classroom.
+     * @param command The create classroom command containing the classroom data.
+     * @return The ID of the created classroom.
+     * @throws IllegalArgumentException if a classroom with the same code already exists or if there's an error saving the classroom.
+     * @see CreateClassroomCommand
+     * @see Classroom
+     */
     @Override
     public Long handle(CreateClassroomCommand command) {
         if (classroomRepository.existsByCode(command.code())) {
@@ -34,6 +50,14 @@ public class ClassroomCommandServiceImpl implements ClassroomCommandService {
         return classroom.getId();
     }
 
+    /**
+     * This method is used to handle the update of an existing classroom.
+     * @param command The update classroom command containing the updated classroom data.
+     * @return An optional with the updated classroom if successful, otherwise an empty optional.
+     * @throws IllegalArgumentException if a classroom with the same code already exists, if the classroom to update is not found, or if there's an error updating the classroom.
+     * @see UpdateClassroomCommand
+     * @see Classroom
+     */
     @Override
     public Optional<Classroom> handle(UpdateClassroomCommand command) {
 
@@ -55,6 +79,12 @@ public class ClassroomCommandServiceImpl implements ClassroomCommandService {
         }
     }
 
+    /**
+     * This method is used to handle the deletion of an existing classroom.
+     * @param command The delete classroom command containing the classroom ID to delete.
+     * @throws IllegalArgumentException if the classroom to delete is not found or if there's an error deleting the classroom.
+     * @see DeleteClassroomCommand
+     */
     @Override
     public void handle(DeleteClassroomCommand command) {
         if (!classroomRepository.existsById(command.classroomId())) {

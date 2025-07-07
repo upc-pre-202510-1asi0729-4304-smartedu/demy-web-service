@@ -1,7 +1,5 @@
 package com.smartedu.demy.platform.scheduling.domain.model.queries;
 
-import com.smartedu.demy.platform.scheduling.domain.model.valueobjects.ClassroomId;
-
 public record GetClassroomByIdQuery(Long classroomId) {
 
     public GetClassroomByIdQuery {

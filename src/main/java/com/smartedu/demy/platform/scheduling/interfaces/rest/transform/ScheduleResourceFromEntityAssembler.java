@@ -16,7 +16,8 @@ public class ScheduleResourceFromEntityAssembler {
                 entity.getTimeRange().endTime().toString(),
                 entity.getDayOfWeek().name(),
                 entity.getCourseId().id(),
-                entity.getClassroomId().id()
+                entity.getClassroomId().id(),
+                entity.getTeacherId().value()
         );
     }
 }

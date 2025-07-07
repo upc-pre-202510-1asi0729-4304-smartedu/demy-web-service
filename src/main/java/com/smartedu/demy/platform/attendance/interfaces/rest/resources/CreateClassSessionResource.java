@@ -10,17 +10,17 @@ import java.util.List;
  * @since 1.0
  */
 public record CreateClassSessionResource(
-        String courseId,
-        String date,
+        Long courseId,
+        LocalDate date,
         List<AttendanceRecordResource> attendance) {
     /**
      * Validates the resource.
      * @throws IllegalArgumentException if courseId, date  or attendance is null
      */
     public CreateClassSessionResource{
-        if(courseId == null ||courseId.isEmpty() )
+        if (courseId == null)
             throw new IllegalArgumentException("Course ID cannot be null");
-        if(date == null|| date.isBlank())
+        if(date == null|| date.isBefore(LocalDate.now()))
             throw new IllegalArgumentException("Date cannot be null or in the past");
         if(attendance == null || attendance.isEmpty())
             throw new IllegalArgumentException("Attendance cannot be null or empty");

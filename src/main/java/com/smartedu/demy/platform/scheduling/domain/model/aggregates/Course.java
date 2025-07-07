@@ -9,14 +9,27 @@ import org.apache.logging.log4j.util.Strings;
 
 @Getter
 @Entity
+/**
+ * Represents a course entity in the scheduling domain.
+ * Extends AuditableAbstractAggregateRoot for auditing capabilities.
+ */
 public class Course extends AuditableAbstractAggregateRoot<Course> {
 
+    /**
+     * Name of the course.
+     */
     private String name;
+    /**
+     * Unique code for the course.
+     */
     private String code;
+    /**
+     * Description of the course.
+     */
     private String description;
 
     /**
-     * Default constructor
+     * Default constructor. Initializes fields to empty strings.
      */
     public Course() {
         this.name = Strings.EMPTY;
@@ -25,7 +38,7 @@ public class Course extends AuditableAbstractAggregateRoot<Course> {
     }
 
     /**
-     * Constructor with parameters
+     * Constructor with parameters.
      * @param name Course name
      * @param code Course code
      * @param description Course description

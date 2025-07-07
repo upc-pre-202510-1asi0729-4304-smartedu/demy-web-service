@@ -1,0 +1,29 @@
+@startuml
+package demy-platform-backend as demy_platform_backend  {
+    package iam {
+        package domain {}
+        package infrastructure {}
+        package application {}
+        package interfaces {}
+    }
+'    package iam {}
+'    package scheduling {}
+'    package billing {}
+'    package attendance {}
+'    package shared {}
+}
+package org.springframework.data.domain {}
+package org.hibernate.boot.model.naming {}
+
+demy_platform_backend.iam.domain ..> org.springframework.data.domain
+demy_platform_backend.iam.infrastructure ..> demy_platform_backend.iam.domain
+demy_platform_backend.iam.application ..> demy_platform_backend.iam.domain
+demy_platform_backend.iam.application ..> demy_platform_backend.iam.infrastructure
+demy_platform_backend.iam.interfaces ..> demy_platform_backend.iam.application
+demy_platform_backend.iam.interfaces ..> demy_platform_backend.iam.domain
+demy_platform_backend.shared.domain.model.services.PasswordHasher ..> org.hibernate.boot.model.naming
+demy_platform_backend.shared.domain.model.services.PasswordHasher ..> org.hibernate.boot.model.naming
+demy_platform_backend.shared.domain.model.valueobjects.UserId ..> org.hibernate.boot.model.naming 
+
+
+@enduml

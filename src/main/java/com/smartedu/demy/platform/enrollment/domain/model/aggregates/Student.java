@@ -1,7 +1,7 @@
 package com.smartedu.demy.platform.enrollment.domain.model.aggregates;
 
 import com.smartedu.demy.platform.enrollment.domain.model.commands.CreateStudentCommand;
-import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.Dni;
+import com.smartedu.demy.platform.shared.domain.model.valueobjects.Dni;
 import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.PersonName;
 import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.PhoneNumber;
 import com.smartedu.demy.platform.enrollment.domain.model.valueobjects.Sex;

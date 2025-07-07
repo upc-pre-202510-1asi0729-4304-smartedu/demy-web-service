@@ -4,10 +4,22 @@ import com.smartedu.demy.platform.iam.domain.model.commands.UpdateUserAccountCom
 import com.smartedu.demy.platform.iam.domain.model.valueobjects.Roles;
 import com.smartedu.demy.platform.iam.interfaces.rest.resources.UpdateUserAccountResource;
 
+/**
+ * Assembler class to convert {@link UpdateUserAccountResource} DTOs
+ * into {@link UpdateUserAccountCommand} domain commands.
+ */
 public class UpdateUserAccountCommandFromResourceAssembler {
-    public static UpdateUserAccountCommand toCommandFromResource(UpdateUserAccountResource resource) {
+
+    /**
+     * Converts a {@link UpdateUserAccountResource} and an ID into an {@link UpdateUserAccountCommand}.
+     *
+     * @param id the user account ID to update
+     * @param resource the resource DTO containing updated user details
+     * @return a new {@link UpdateUserAccountCommand} populated with data from the resource and ID
+     */
+    public static UpdateUserAccountCommand toCommandFromResource(Long id,UpdateUserAccountResource resource) {
         return new UpdateUserAccountCommand(
-                resource.id(),
+                id,
                 resource.firstName(),
                 resource.lastName(),
                 resource.email(),
