@@ -1,13 +1,12 @@
 package com.smartedu.demy.platform.enrollment.interfaces.rest.resources;
 
-import com.smartedu.demy.platform.enrollment.domain.model.aggregates.Enrollment;
-
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.Date;
 
-public record EnrollmentResource(Long enrollmentId, Long studentId, Long academicPeriodId, Long weeklyScheduleId, BigDecimal amount, Currency currency, String enrollmentStatus, String paymentStatus) {
+public record EnrollmentResource(Long id, Long studentId, Long academicPeriodId, Long weeklyScheduleId, BigDecimal amount, Currency currency, Date createdAt, String enrollmentStatus, String paymentStatus) {
     public EnrollmentResource {
-       if (enrollmentId == null || amount == null || currency == null) {
+       if (id == null || amount == null || currency == null) {
            throw new IllegalArgumentException("Both enrollmentId and amount and currency are null");
        }
     }

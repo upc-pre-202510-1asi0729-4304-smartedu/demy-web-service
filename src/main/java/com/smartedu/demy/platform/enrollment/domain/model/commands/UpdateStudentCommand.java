@@ -22,5 +22,8 @@ public record UpdateStudentCommand(Long studentId, String firstName, String last
         if (address == null || address.isBlank()) {
             throw new IllegalArgumentException("address cannot be null or blank");
         }
+        if (birthDate == null || birthDate.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("birthDate cannot be null or after today");
+        }
     }
 }

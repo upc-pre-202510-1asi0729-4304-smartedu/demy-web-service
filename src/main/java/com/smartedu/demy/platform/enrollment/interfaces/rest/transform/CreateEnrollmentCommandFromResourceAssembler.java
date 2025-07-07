@@ -7,7 +7,7 @@ public class CreateEnrollmentCommandFromResourceAssembler {
     public static CreateEnrollmentCommand toCommandFromResource(CreateEnrollmentResource resource) {
         return new CreateEnrollmentCommand(
                 resource.studentId(),
-                resource.periodId(),
+                resource.academicPeriodId(),
                 resource.weeklyScheduleName(),
                 resource.amount(),
                 resource.currency(),

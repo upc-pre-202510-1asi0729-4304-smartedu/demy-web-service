@@ -11,6 +11,9 @@ public record CreateEnrollmentCommand(Long studentId, Long periodId, String week
         if (periodId == null || periodId < 1) {
             throw new IllegalArgumentException("periodId cannot be null or blank");
         }
+        if (weeklyScheduleName == null || weeklyScheduleName.isBlank()) {
+            throw new IllegalArgumentException("weeklyScheduleName cannot be null or blank");
+        }
         if (amount == null || amount.compareTo(BigDecimal.ZERO) < 0) {
             throw new IllegalArgumentException("amount cannot be null or negative");
         }
