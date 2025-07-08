@@ -21,6 +21,11 @@ ALTER TABLE enrollments
             REFERENCES academic_periods (id);
 
 ALTER TABLE enrollments
-    ADD CONSTRAINT FK_enrollments_weekly_schedule_id
+    ADD CONSTRAINT FK_enrollments_weekly_schedules_id
         FOREIGN KEY (weekly_schedule_id)
             REFERENCES weekly_schedules (id);
+
+ALTER TABLE payments
+    ADD CONSTRAINT FK_payments_invoices_id
+        FOREIGN KEY (invoice_id)
+            REFERENCES invoices (id);
